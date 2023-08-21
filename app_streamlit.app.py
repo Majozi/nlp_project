@@ -1,4 +1,7 @@
 import streamlit as st
+!pip install sklearn
+!pip install nltk
+!pip install pandas
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
 import pandas as pd
