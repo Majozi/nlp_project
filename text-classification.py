@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from sklearn.cluster import KMeans
 from transformers import pipeline, BertTokenizer, BertModel
-import torch
+import pytorch
 import numpy as np
 from scipy.spatial.distance import cdist
 import base64
