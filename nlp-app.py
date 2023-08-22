@@ -52,9 +52,16 @@ operation = st.selectbox('Choose an operation:', ['Text Classification', 'Summar
 # Trigger buttons
 if st.button('Start Analysis'):
     if uploaded_file is not None:
-        # Read the uploaded file
-        uploaded_text = uploaded_file.read().decode()
-
+        # Read the uploaded file based on its type
+        if uploaded_file.type == 'text/plain':
+            uploaded_text = uploaded_file.read().decode()
+        elif uploaded_file.type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv']:
+            df = pd.read_excel(uploaded_file) if uploaded_file.type.endswith('sheet') else pd.read_csv(uploaded_file)
+            uploaded_text = ' '.join(df['text'].dropna().astype('str')) # Assuming the text is in the 'text' column
+        else:
+            st.warning("Unsupported file type")
+            uploaded_text = ""
+        
         st.write(f"Performing {operation}...")
         if operation == 'Text Classification':
             user_labels = st.text_input("Enter the labels for classification (comma-separated):")
