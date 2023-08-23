@@ -5,6 +5,9 @@ from nltk.corpus import stopwords
 import nltk
 import os
 from transformers import pipeline
+from nltk.stem import WordNetLemmatizer
+from sklearn.decomposition import LatentDirichletAllocation
+import re
 
 # Downloading the NLTK stopwords list if not downloaded
 nltk.download('stopwords')
