@@ -11,29 +11,18 @@ st.markdown("""
         .navbar {
             height: 100px;
             width: 100%;
-            background-color: #005baa;
+            background-color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px 10px 0 10px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
+            padding: 0 10px;
         }
         .navbar img {
-            width: 80px;
-            height: 80px;
+            width: 100px;
             border-radius: 50%;
         }
         .navbar div {
             text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-        }
-        .stApp {
-            margin-top: 120px;
         }
     </style>
     <div class="navbar">
@@ -51,6 +40,7 @@ Natural Language Processing (NLP) is a field of artificial intelligence that ena
 
 # The rest of your code remains the same
 # ...
+
 
 
 # Text Classification
