@@ -13,7 +13,7 @@ html_code = """
 <head>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body style="margin-top: 220px;">
+<body style="margin-top: 200px;">
     <nav class="navbar navbar-expand-lg navbar-light" style="height: 100px; width: 100%; background-color: #005baa; position: fixed; top: 50px; left: 0; z-index: 1000;">
         <div class="container d-flex justify-content-between align-items-center" style="padding: 20px 10px 0 10px;">
             <div style="text-align: center; font-size: 25px; font-weight: bold; color: white;">Natural Language Processing</div>
