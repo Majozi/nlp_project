@@ -13,7 +13,7 @@ def thematic_analysis(file):
     df = df[['text']].dropna()
 
     stoplist = stopwords.words('english')
-    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(3, 4))
+    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(2, 4))
     ngrams = c_vec.fit_transform(df['text'])
     count_values = ngrams.toarray().sum(axis=0)
     vocab = c_vec.vocabulary_
