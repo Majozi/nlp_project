@@ -17,7 +17,7 @@ html_code = """
     <nav class="navbar navbar-expand-lg navbar-light" style="height: 100px; width: 100%; background-color: #005baa; position: fixed; top: 50px; left: 0; z-index: 1000;">
         <div class="container d-flex justify-content-between align-items-center" style="padding: 20px 10px 0 10px;">
             <div style="text-align: center; font-size: 25px; font-weight: bold; color: white;">Natural Language Processing</div>
-            <img src="https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png" alt="Logo" style="height: 90px; padding: 5px; border-radius: 20%;" />
+            <img src="https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png" alt="Logo" style="height: 90px; width: 90px" />
             <div style="text-align: center; font-size: 25px; font-weight: bold; color: white;">Exploring open-source models</div>
         </div><br><br><br>
     </nav>
