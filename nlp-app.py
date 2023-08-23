@@ -16,8 +16,8 @@ st.markdown("""
             align-items: center;
             justify-content: space-between;
             padding: 20px 10px 0 10px;
-            position: sticky;
-            top: 100;
+            position: fixed;
+            top: 0;
             left: 0;
             z-index: 1000;
         }
@@ -48,6 +48,10 @@ st.title('NLP Analysis App')
 st.write("""
 Natural Language Processing (NLP) is a field of artificial intelligence that enables computers to understand, interpret, and generate human language. This technology allows machines to interact with text data, perform various analyses, and extract meaningful insights. The following app provides different NLP techniques to analyze and process text data.
 """)
+
+# The rest of your code remains the same
+# ...
+
 
 # Text Classification
 def classify_text(text, labels):
