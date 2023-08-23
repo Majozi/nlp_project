@@ -28,7 +28,7 @@ def thematic_analysis(file, ngram_range):
 image_url = "https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png"
 
 # Displaying the image
-st.image(image_url, width=200)
+st.image(image_url, width=100)
 
 # Top Navigation
 st.sidebar.title('Navigation')
