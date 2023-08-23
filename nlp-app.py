@@ -33,7 +33,7 @@ st.markdown("""
             color: white;
         }
         .stApp {
-            margin-top: 200px;
+            margin-top: 120px;
         }
     </style>
     <div class="navbar">
