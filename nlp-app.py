@@ -15,9 +15,9 @@ st.markdown("""
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 60px 0px 0 10px;
-            position: fixed;
-            top: 0;
+            padding: 20px 10px 0 10px;
+            position: sticky;
+            top: 100;
             left: 0;
             z-index: 1000;
         }
