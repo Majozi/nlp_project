@@ -15,7 +15,7 @@ st.markdown("""
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 10px;
+            padding: 20px 10px 0 10px;
             position: fixed;
             top: 0;
             left: 0;
@@ -33,7 +33,7 @@ st.markdown("""
             color: white;
         }
         .stApp {
-            margin-top: 100px;
+            margin-top: 120px;
         }
     </style>
     <div class="navbar">
