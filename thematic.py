@@ -30,10 +30,3 @@ uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column"
 if uploaded_file is not None:
     df_ngram = thematic_analysis(uploaded_file)
     st.write(df_ngram)
-
-    # Optional: Save as an Excel file
-    downloads_path = os.path.expanduser("~\Downloads")  # Get the default Downloads folder path
-    file_path = os.path.join(downloads_path, 'nlp_analysis.xlsx')
-    with pd.ExcelWriter(file_path) as writer:
-        df_ngram.to_excel(writer, sheet_name='thematic')
-    st.success(f"File saved to {file_path}")
