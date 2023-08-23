@@ -9,12 +9,12 @@ import os
 nltk.download('stopwords')
 
 # Function for thematic analysis
-def thematic_analysis(file):
+def thematic_analysis(file, ngram_range):
     df = pd.read_excel(file)
     df = df[['text']].dropna()
 
     stoplist = stopwords.words('english')
-    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(2, 4))
+    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=ngram_range)
     ngrams = c_vec.fit_transform(df['text'])
     count_values = ngrams.toarray().sum(axis=0)
     vocab = c_vec.vocabulary_
@@ -76,9 +76,13 @@ elif selection == 'N-Grams (Thematic)':
     technique in text mining and natural language processing.
     """)
 
+    ngram_min = st.sidebar.slider("Minimum N-Gram", 1, 5, 3)
+    ngram_max = st.sidebar.slider("Maximum N-Gram", ngram_min, 5, 4)
+    ngram_range = (ngram_min, ngram_max)
+
     uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
     if uploaded_file is not None:
-        df_ngram = thematic_analysis(uploaded_file)
+        df_ngram = thematic_analysis(uploaded_file, ngram_range)
         st.write(df_ngram)
 
         # Optional: Save as an Excel file
