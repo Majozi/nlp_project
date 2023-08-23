@@ -5,6 +5,33 @@ from sklearn.decomposition import LatentDirichletAllocation
 import matplotlib.pyplot as plt
 import pandas as pd
 
+# Top Navigation Bar
+st.markdown("""
+    <style>
+        .navbar {
+            height: 100px;
+            width: 100%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+        .navbar img {
+            width: 100px;
+            border-radius: 50%;
+        }
+        .navbar div {
+            text-align: center;
+        }
+    </style>
+    <div class="navbar">
+        <div>Natural Language Processing</div>
+        <img src="https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png" alt="Logo" />
+        <div>Exploring open-source models</div>
+    </div>
+""", unsafe_allow_html=True)
+
 # Title and Introduction about NLP
 st.title('NLP Analysis App')
 st.write("""
