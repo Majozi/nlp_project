@@ -1,4 +1,28 @@
 import streamlit as st
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus import stopwords
+import nltk
+import os
+
+# Downloading the NLTK stopwords list if not downloaded
+nltk.download('stopwords')
+
+# Function for thematic analysis
+def thematic_analysis(file):
+    df = pd.read_excel(file)
+    df = df[['text']].dropna()
+
+    stoplist = stopwords.words('english')
+    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(3, 4))
+    ngrams = c_vec.fit_transform(df['text'])
+    count_values = ngrams.toarray().sum(axis=0)
+    vocab = c_vec.vocabulary_
+
+    df_ngram = pd.DataFrame(sorted([(count_values[i], k) for k, i in vocab.items()],
+                                   reverse=True)).rename(columns={0: 'frequency', 1: 'bigram/trigram'})
+
+    return df_ngram
 
 # Top Navigation
 st.sidebar.title('Navigation')
@@ -52,40 +76,22 @@ elif selection == 'N-Grams (Thematic)':
     technique in text mining and natural language processing.
     """)
 
+    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+    if uploaded_file is not None:
+        df_ngram = thematic_analysis(uploaded_file)
+        st.write(df_ngram)
+
+        # Optional: Save as an Excel file
+        downloads_path = os.path.expanduser("~\Downloads")
+        file_path = os.path.join(downloads_path, 'nlp_analysis.xlsx')
+        with pd.ExcelWriter(file_path) as writer:
+            df_ngram.to_excel(writer, sheet_name='thematic')
+        st.success(f"File saved to {file_path}")
+
 # Text Classification Page
 elif selection == 'Text Classification':
     st.title('Text Classification')
-    def classification():
-    candidate_labels_input = st.text_input("Enter candidate labels, separated by commas (e.g., positive,negative):")
-    candidate_labels = candidate_labels_input.split(",") if candidate_labels_input else []
-
-    uploaded_file = st.file_uploader("Choose a file")
-    if uploaded_file:
-        df = pd.read_excel(uploaded_file)
-        df = df[['text']].dropna()
-
-        if not candidate_labels:
-            candidate_labels = ["positive", "negative"]
-
-        classifier = pipeline(task="zero-shot-classification", model="facebook/bart-large-mnli")
-
-        res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
-
-        # Assuming you have the final DataFrames ready, you can display them as tables:
-        st.write(classified_text_neg_pos_sample)
-        st.write(classified_text_normalized_neg_pos)
-        st.write(bert_classification_sample)
-
-        # You can also provide download links for the Excel files:
-        # ...
-
-if __name__ == '__main__':
-    classification()
-    st.write("""
-    Text classification is the task of categorizing text into predefined classes or labels. 
-    It includes applications like spam detection, topic labeling, sentiment analysis, and more. 
-    Machine learning models, especially large language models, have excelled in this domain.
-    """)
+    # Additional code for text classification functionality can go here
 
 # Topic Modelling Page
 elif selection == 'Topic Modelling':
