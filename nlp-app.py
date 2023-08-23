@@ -42,11 +42,8 @@ def classify_text(text, labels):
 # Summarization
 def summarize_text(text):
     summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-    summarized_text = summarizer(text)[0]['summary_text']
-    negative_count = summarized_text.count('negative')
-    positive_count = summarized_text.count('positive')
-    return summarized_text, negative_count, positive_count
-
+    
+    return summarized_text
 # Topic Modeling
 def perform_topic_modeling(text):
     vectorizer = CountVectorizer()
@@ -93,9 +90,6 @@ if st.button('Start Analysis'):
         elif operation == 'Summarization':
             summarized_text, negative_count, positive_count = summarize_text(uploaded_text)
             st.write("Summarized Text:", summarized_text)
-            fig, ax = plt.subplots()
-            ax.pie([negative_count, positive_count], labels=['Negative', 'Positive'], autopct='%1.1f%%')
-            st.pyplot(fig)
         elif operation == 'Topic Modeling':
             topics = perform_topic_modeling(uploaded_text)
             st.write("Topics:", topics)
