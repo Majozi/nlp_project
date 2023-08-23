@@ -4,6 +4,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
 import nltk
 import os
+from transformers import pipeline
 
 # Downloading the NLTK stopwords list if not downloaded
 nltk.download('stopwords')
