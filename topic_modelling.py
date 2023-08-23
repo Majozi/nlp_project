@@ -1,3 +1,19 @@
+import streamlit as st
+import pandas as pd
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+import nltk
+import re
+
+# Downloading the NLTK resources if not downloaded
+nltk.download('stopwords')
+nltk.download('wordnet')
+
+# Topic Modelling Page
+st.title('Topic Modelling')
+
 # Upload file
 uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
 
@@ -34,7 +50,7 @@ if uploaded_file:
     df['clean_feeds'] = df.text.apply(clean_text)
 
     # the vectorizer object will be used to transform text to vector form
-    vectorizer = CountVectorizer(token_pattern='\w+|\$[\d\.]+|\S+') # Removed max_df and min_df
+    vectorizer = CountVectorizer(token_pattern='\w+|\$[\d\.]+|\S+')
     # apply transformation
     tf = vectorizer.fit_transform(df['clean_feeds']).toarray()
     # tf_feature_names tells us what word each column in the matrix represents
