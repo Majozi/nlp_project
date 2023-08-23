@@ -24,6 +24,12 @@ def thematic_analysis(file, ngram_range):
 
     return df_ngram
 
+# Image URL
+image_url = "https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png"
+
+# Displaying the image
+st.image(image_url, width=200)
+
 # Top Navigation
 st.sidebar.title('Navigation')
 selection = st.sidebar.radio("Go to", ['Getting Started', 'Summarization', 'Sentiment', 'Toxicity', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling'])
@@ -84,6 +90,13 @@ elif selection == 'N-Grams (Thematic)':
     if uploaded_file is not None:
         df_ngram = thematic_analysis(uploaded_file, ngram_range)
         st.write(df_ngram)
+
+        # Optional: Save as an Excel file
+        downloads_path = os.path.expanduser("~\Downloads")
+        file_path = os.path.join(downloads_path, 'nlp_analysis.xlsx')
+        with pd.ExcelWriter(file_path) as writer:
+            df_ngram.to_excel(writer, sheet_name='thematic')
+        st.success(f"File saved to {file_path}")
 
 # Text Classification Page
 elif selection == 'Text Classification':
