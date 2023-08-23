@@ -94,7 +94,42 @@ elif selection == 'N-Grams (Thematic)':
 # Text Classification Page
 elif selection == 'Text Classification':
     st.title('Text Classification')
-    # Additional code for text classification functionality can go here
+
+    candidate_labels_input = st.text_input("Enter candidate labels, separated by commas (e.g., positive,negative,neutral):")
+    candidate_labels = candidate_labels_input.split(",") if candidate_labels_input else []
+
+    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+
+    if uploaded_file:
+        df = pd.read_excel(uploaded_file)
+        df = df[['text']].dropna()
+
+        if not candidate_labels:
+            # If no candidate labels are provided, use default labels
+            candidate_labels = ["positive", "negative", "neutral"]
+
+        classifier = pipeline(task="zero-shot-classification", model="facebook/bart-large-mnli")
+
+        res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
+
+        def make_table_data(res_list):
+            labels = []
+            seq = []
+            scores = []
+            for item in res_list:
+                labels.append(item['labels'][0])
+                seq.append(item['sequence'])
+                scores.append(item['scores'][0])
+
+            return seq, labels, scores
+
+        seq, labels, scores = make_table_data(res)
+
+        classified_text_neg_pos = pd.DataFrame(list(zip(seq, labels, scores)), columns=['Text', 'Label', 'Score'])
+        classified_text_normalized_neg_pos = pd.DataFrame(classified_text_neg_pos['Label'].value_counts(normalize=True))
+
+        st.write(classified_text_neg_pos)
+        st.write(classified_text_normalized_neg_pos)
 
 # Topic Modelling Page
 elif selection == 'Topic Modelling':
