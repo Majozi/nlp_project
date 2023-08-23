@@ -1,25 +1,10 @@
-import streamlit as st
-import pandas as pd
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-import nltk
-import re
-
-# Downloading the NLTK resources if not downloaded
-nltk.download('stopwords')
-nltk.download('wordnet')
-
-# Topic Modelling Page
-st.title('Topic Modelling')
-
 # Upload file
 uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
 
 # Input for min and max value of topics
 min_topics = st.slider("Select the Minimum Number of Topics", min_value=1, max_value=10, value=1)
-max_topics = st.slider("Select the Maximum Number of Topics", min_value=min_topics, max_value=10, value=3)
+max_topics = st.slider("Select the Maximum Number of Topics", min_value=min_topics, max_value=20, value=5)
+no_top_words = st.slider("Select the Number of Top Words", min_value=1, max_value=50, value=20)
 
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
@@ -67,7 +52,6 @@ if uploaded_file:
                             for i in topic.argsort()[:-no_top_words - 1:-1]]
         return pd.DataFrame(topic_dict)
 
-    no_top_words = 10
     topics = display_topics(model, tf_feature_names, no_top_words)
 
     st.write(topics)
