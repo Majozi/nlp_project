@@ -163,17 +163,18 @@ if uploaded_file:
         return lemmatizer.lemmatize(word)
 
     # Cleaning master function
-    def clean_text(text, bigrams=False):
-        text = text.lower() # lower case
-        text = re.sub('['+my_punctuation + ']+', ' ', text) # strip punctuation
-        text = re.sub('\s+', ' ', text) #remove double spacing
-        text = re.sub('([0-9]+)', '', text) # remove numbers
-        text_token_list = [word for word in text.split(' ') if word not in my_stopwords] # remove stopwords
-        text_token_list = [word_rooter(word) if '#' not in word else word for word in text_token_list] # apply word rooter
-        if bigrams:
-            text_token_list = text_token_list+[text_token_list[i]+'_'+text_token_list[i+1] for i in range(len(text_token_list)-1)]
-        text = ' '.join(text_token_list)
-        return text
+   def clean_text(text, bigrams=False):
+    text = text.lower() # lower case
+    text = re.sub('[' + re.escape(my_punctuation) + ']+', ' ', text) # strip punctuation
+    text = re.sub('\s+', ' ', text) # remove double spacing
+    text = re.sub('([0-9]+)', '', text) # remove numbers
+    text_token_list = [word for word in text.split(' ') if word not in my_stopwords] # remove stopwords
+    text_token_list = [word_rooter(word) if '#' not in word else word for word in text_token_list] # apply word rooter
+    if bigrams:
+        text_token_list = text_token_list + [text_token_list[i] + '_' + text_token_list[i+1] for i in range(len(text_token_list) - 1)]
+    text = ' '.join(text_token_list)
+    return text
+
 
     df['clean_feeds'] = df.text.apply(clean_text)
 
