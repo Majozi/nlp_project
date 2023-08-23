@@ -16,6 +16,7 @@ st.markdown("""
             align-items: center;
             justify-content: space-between;
             padding: 0 10px;
+            position: sticky;
         }
         .navbar img {
             width: 100px;
