@@ -1,31 +1,38 @@
 import streamlit as st
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus import stopwords
+
+# Make sure to download the NLTK stopwords list if you haven't already
 import nltk
+nltk.download('stopwords')
 
-def thematic():
-    uploaded_file = st.file_uploader("Choose a file")
-    if uploaded_file:
-        # Assuming the file is in Excel format
-        df = pd.read_excel(uploaded_file)
-        df = df[['text']].dropna()
+def thematic_analysis(file):
+    df = pd.read_excel(file)  # Reading the Excel file
+    df = df[['text']].dropna()
 
-        stoplist = stopwords.words('english')
-        c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(3,4))
-        ngrams = c_vec.fit_transform(df['text'])
-        count_values = ngrams.toarray().sum(axis=0)
-        vocab = c_vec.vocabulary_
+    stoplist = stopwords.words('english')
+    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(3, 4))
+    ngrams = c_vec.fit_transform(df['text'])
+    count_values = ngrams.toarray().sum(axis=0)
+    vocab = c_vec.vocabulary_
 
-        df_ngram = pd.DataFrame(sorted([(count_values[i],k) for k,i in vocab.items()],
-                                        reverse=True)).rename(columns={0: 'frequency', 1:'bigram/trigram'})
-        
-        # You can add some filtering or visualization here if needed
-        
-        # Download the result as an Excel file
-        excel_file = df_ngram.to_excel(index=False)
-        b64 = base64.b64encode(excel_file.encode()).decode()  
-        href = f'<a href="data:file/excel;base64,{b64}" download="nlp_analysis.xlsx">Download the NLP Analysis</a>'
-        st.markdown(href, unsafe_allow_html=True)
+    df_ngram = pd.DataFrame(sorted([(count_values[i], k) for k, i in vocab.items()],
+                                   reverse=True)).rename(columns={0: 'frequency', 1: 'bigram/trigram'})
 
-if __name__ == '__main__':
-    thematic()
+    return df_ngram
+
+# Main app
+st.title("Thematic Analysis Using N-Grams")
+uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+
+if uploaded_file is not None:
+    df_ngram = thematic_analysis(uploaded_file)
+    st.write(df_ngram)
+
+    # Optional: Save as an Excel file
+    downloads_path = os.path.expanduser("~\Downloads")  # Get the default Downloads folder path
+    file_path = os.path.join(downloads_path, 'nlp_analysis.xlsx')
+    with pd.ExcelWriter(file_path) as writer:
+        df_ngram.to_excel(writer, sheet_name='thematic')
+    st.success(f"File saved to {file_path}")
