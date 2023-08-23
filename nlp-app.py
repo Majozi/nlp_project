@@ -30,6 +30,7 @@ st.markdown(html_code, unsafe_allow_html=True)
 # Title and Introduction about NLP
 st.title('')
 st.write("""
+<br><br><br>
 Natural Language Processing (NLP) is a field of artificial intelligence that enables computers to understand, interpret, and generate human language. This technology allows machines to interact with text data, perform various analyses, and extract meaningful insights. The following app provides different NLP techniques to analyze and process text data.
 """)
 
