@@ -17,7 +17,7 @@ html_code = """
     <nav class="navbar navbar-expand-lg navbar-light" style="height: 100px; width: 100%; background-color: #005baa; position: fixed; top: 50px; left: 0; z-index: 1000;">
         <div class="container d-flex justify-content-between align-items-center" style="padding: 20px 10px 0 10px;">
             <div style="text-align: center; font-size: 25px; font-weight: bold; color: white;">Natural Language Processing</div>
-            <img src="https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png" alt="Logo" style=" height: 100px; border-radius: 80%;" />
+            <img src="https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png" alt="Logo" style=" height: 100px; border-radius: 120%;" />
             <div style="text-align: center; font-size: 25px; font-weight: bold; color: white;">Exploring open-source models</div>
         </div><br><br><br>
     </nav>
@@ -30,13 +30,8 @@ st.markdown(html_code, unsafe_allow_html=True)
 # Title and Introduction about NLP
 st.title('')
 st.write("""
-<br><br><br>
 Natural Language Processing (NLP) is a field of artificial intelligence that enables computers to understand, interpret, and generate human language. This technology allows machines to interact with text data, perform various analyses, and extract meaningful insights. The following app provides different NLP techniques to analyze and process text data.
 """)
-
-# The rest of your code remains the same
-# ...
-
 
 # Text Classification
 def classify_text(text, labels):
