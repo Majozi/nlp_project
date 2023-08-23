@@ -77,6 +77,15 @@ elif selection == 'Toxicity':
     Machine learning models, including transformers, have become vital tools in automating this process.
     """)
 
+# Toxicity Page
+elif selection == 'Topic Modelling':
+    st.title('Topic Modelling')
+    st.write("""
+    Toxicity detection is essential in moderating online discussions. It involves identifying 
+    and filtering out toxic or harmful content, such as hate speech, abusive language, or misinformation. 
+    Machine learning models, including transformers, have become vital tools in automating this process.
+    """)
+
 # N-Grams (Thematic) Page
 elif selection == 'N-Grams (Thematic)':
     st.title('N-Grams (Thematic) Analysis')
