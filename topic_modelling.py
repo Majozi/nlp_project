@@ -49,9 +49,9 @@ if uploaded_file:
     df['clean_feeds'] = df.text.apply(clean_text)
 
     # the vectorizer object will be used to transform text to vector form
-    vectorizer = CountVectorizer(max_df=0.9, min_df=5, token_pattern='\w+|\$[\d\.]+|\S+')
-    # apply transformation
-    tf = vectorizer.fit_transform(df['clean_feeds']).toarray()
+vectorizer = CountVectorizer(token_pattern='\w+|\$[\d\.]+|\S+')
+# apply transformation
+tf = vectorizer.fit_transform(df['clean_feeds']).toarray()
     # tf_feature_names tells us what word each column in the matrix represents
     tf_feature_names = vectorizer.get_feature_names_out()
 
