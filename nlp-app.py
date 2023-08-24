@@ -54,8 +54,7 @@ if selection == 'Getting Started':
     for specific tasks. This introduction provides an overview of their capabilities and uses.
     """)
 
-# Summarization Page
-elif selection == 'Sentiment':
+if selection == 'Sentiment':
     st.title("Sentiment Analysis")
 
     uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
