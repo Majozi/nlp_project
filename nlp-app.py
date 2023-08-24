@@ -43,7 +43,7 @@ st.image(image_url, width=100)
 st.sidebar.title('Navigation')
 selection = st.sidebar.radio("Go to", ['Getting Started', 'Summarization', 'Sentiment', 'Toxicity', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling'])
 
-elif selection == 'Getting Started':
+if selection == 'Getting Started':
     st.title("Natural Language Processing")
     st.write("""
 
@@ -51,7 +51,7 @@ Natural Language Processing (NLP) is a multifaceted field that integrates comput
     """)
 
 
-if selection == 'Sentiment':
+elif selection == 'Sentiment':
     st.title("Sentiment Analysis")
 
     uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
