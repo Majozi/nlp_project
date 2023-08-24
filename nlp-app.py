@@ -186,7 +186,7 @@ elif selection == 'Thematic':
     st.title("Thematic Analysis Using N-Grams")
     uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
 
-if uploaded_file is not None:
-    df_ngram = thematic_analysis(uploaded_file)
-    st.write(df_ngram)
+    if uploaded_file is not None:
+        df_ngram = thematic_analysis(uploaded_file)
+        st.write(df_ngram)
 
