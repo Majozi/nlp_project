@@ -10,6 +10,7 @@ import re
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import Trainer
 import numpy as np
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 # Downloading the NLTK resources if not downloaded
 nltk.download('stopwords')
@@ -54,10 +55,8 @@ if selection == 'Getting Started':
 
 # Summarization Page
 elif selection == 'Sentiment':
-    st.title('Sentiment')
-    st.write("""
-    Sentiment
-    """)
+    st.title("Sentiment Analysis")
+
 uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
 
 if uploaded_file is not None:
@@ -100,35 +99,6 @@ if uploaded_file is not None:
         with pd.ExcelWriter(download_path) as writer:
             sentiment.to_excel(writer, sheet_name='sentiment')
         st.success(f"File saved to {download_path}")
-
-# Toxicity Page
-elif selection == 'Toxicity':
-    st.title('Toxicity Detection')
-    st.write("""
-    Toxicity detection is essential in moderating online discussions. It involves identifying 
-    and filtering out toxic or harmful content, such as hate speech, abusive language, or misinformation. 
-    Machine learning models, including transformers, have become vital tools in automating this process.
-    """)
-
-
-
-# N-Grams (Thematic) Page
-elif selection == 'N-Grams (Thematic)':
-    st.title('N-Grams (Thematic) Analysis')
-    st.write("""
-    N-Grams are continuous sequences of n items from a given text or speech. Thematic analysis using N-Grams 
-    helps in understanding the context, themes, and frequently occurring patterns in a text. It's a useful 
-    technique in text mining and natural language processing.
-    """)
-
-    ngram_min = st.sidebar.slider("Minimum N-Gram", 1, 5, 3)
-    ngram_max = st.sidebar.slider("Maximum N-Gram", ngram_min, 5, 4)
-    ngram_range = (ngram_min, ngram_max)
-
-    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
-    if uploaded_file is not None:
-        df_ngram = thematic_analysis(uploaded_file, ngram_range)
-        st.write(df_ngram)
 
 # Text Classification Page
 elif selection == 'Text Classification':
