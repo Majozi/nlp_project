@@ -1,109 +1,201 @@
 import streamlit as st
-from transformers import pipeline
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus import stopwords
+import nltk
+from transformers import pipeline
+from nltk.stem import WordNetLemmatizer
+from sklearn.decomposition import LatentDirichletAllocation
+import re
 
-import streamlit as st
+# Downloading the NLTK resources if not downloaded
+nltk.download('stopwords')
+nltk.download('wordnet')
 
-html_code = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body style="margin-top: 200px;">
-    <nav class="navbar navbar-expand-lg navbar-light" style="height: 100px; width: 100%; background-color: #005baa; position: fixed; top: 50px; left: 0; z-index: 1000;">
-        <div class="container d-flex justify-content-between align-items-center" style="padding: 20px 10px 0 10px;">
-            <div style="text-align: center; font-size: 25px; font-weight: bold; color: white;">Natural Language Processing</div>
-            <img src="https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png" alt="Logo" style="height: 90px; width: 90px" />
-            <div style="text-align: center; font-size: 25px; font-weight: bold; color: white;">Exploring open-source models</div>
-        </div><br><br><br>
-    </nav>
-</body>
-</html>
-"""
+# Function for thematic analysis
+def thematic_analysis(file, ngram_range):
+    df = pd.read_excel(file)
+    df = df[['text']].dropna()
 
-st.markdown(html_code, unsafe_allow_html=True)
+    stoplist = stopwords.words('english')
+    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=ngram_range)
+    ngrams = c_vec.fit_transform(df['text'])
+    count_values = ngrams.toarray().sum(axis=0)
+    vocab = c_vec.vocabulary_
 
-# Title and Introduction about NLP
-st.title('')
-st.write("""
-Natural Language Processing (NLP) is a field of artificial intelligence that enables computers to understand, interpret, and generate human language. This technology allows machines to interact with text data, perform various analyses, and extract meaningful insights. The following app provides different NLP techniques to analyze and process text data.
-""")
+    df_ngram = pd.DataFrame(sorted([(count_values[i], k) for k, i in vocab.items()],
+                                   reverse=True)).rename(columns={0: 'frequency', 1: 'bigram/trigram'})
 
-# Text Classification
-def classify_text(text, labels):
-    classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
-    classification = classifier(text, labels)
-    return classification
+    return df_ngram
 
-# Summarization
-def summarize_text(text):
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-    
-    return summarized_text
-# Topic Modeling
-def perform_topic_modeling(text):
-    vectorizer = CountVectorizer()
-    text_vectorized = vectorizer.fit_transform([text])
-    best_topics = 3 # Customize the logic to find the best number of topics
-    lda_model = LatentDirichletAllocation(n_components=best_topics)
-    lda_model.fit(text_vectorized)
-    topics = vectorizer.get_feature_names_out()
-    return topics
+# Image URL
+image_url = "https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png"
 
-# Thematic Analysis (n-grams)
-def perform_thematic_analysis(text):
-    vectorizer = CountVectorizer(ngram_range=(2,2))
-    ngrams = vectorizer.fit_transform([text])
-    ngrams_list = vectorizer.get_feature_names_out()
-    ngrams_count = ngrams.sum(axis=0)
-    return ngrams_list, ngrams_count
+# Displaying the image
+st.image(image_url, width=100)
 
-# File uploader
-uploaded_file = st.file_uploader("Choose a text file", type=['txt', 'csv', 'xlsx'])
+# Top Navigation
+st.sidebar.title('Navigation')
+selection = st.sidebar.radio("Go to", ['Getting Started', 'Summarization', 'Sentiment', 'Toxicity', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling'])
 
-# Operation selector
-operation = st.selectbox('Choose an operation:', ['Text Classification', 'Summarization', 'Topic Modeling', 'Thematic Analysis (n-grams)'])
+# Getting Started Page
+if selection == 'Getting Started':
+    st.title('Getting Started with Large Language Models')
+    st.write("""
+    Large language models, particularly transformers, have revolutionized natural language processing (NLP). 
+    They enable various applications like translation, summarization, sentiment analysis, and more. 
+    Transformers are deep learning models that process words in relation to all other words in a sentence,
+    capturing complex relationships and structures. They're pre-trained on vast datasets and can be fine-tuned
+    for specific tasks. This introduction provides an overview of their capabilities and uses.
+    """)
 
-# Trigger buttons
-if st.button('Start Analysis'):
+# Summarization Page
+elif selection == 'Summarization':
+    st.title('Text Summarization')
+    st.write("""
+    Text summarization is the process of condensing a larger piece of text into a concise summary. 
+    It helps in extracting the essential information from a document, preserving only the most 
+    critical points. Summarization techniques can be abstractive or extractive, with large language 
+    models playing a significant role in generating human-like summaries.
+    """)
+
+# Sentiment Page
+elif selection == 'Sentiment':
+    st.title('Sentiment Analysis')
+    st.write("""
+    Sentiment analysis refers to the use of natural language processing to identify and categorize the sentiment
+    expressed in a piece of text. It can detect whether the sentiment is positive, negative, or neutral, and is widely
+    used in social media monitoring, customer feedback, and market research.
+    """)
+
+# Toxicity Page
+elif selection == 'Toxicity':
+    st.title('Toxicity Detection')
+    st.write("""
+    Toxicity detection is essential in moderating online discussions. It involves identifying 
+    and filtering out toxic or harmful content, such as hate speech, abusive language, or misinformation. 
+    Machine learning models, including transformers, have become vital tools in automating this process.
+    """)
+
+
+
+# N-Grams (Thematic) Page
+elif selection == 'N-Grams (Thematic)':
+    st.title('N-Grams (Thematic) Analysis')
+    st.write("""
+    N-Grams are continuous sequences of n items from a given text or speech. Thematic analysis using N-Grams 
+    helps in understanding the context, themes, and frequently occurring patterns in a text. It's a useful 
+    technique in text mining and natural language processing.
+    """)
+
+    ngram_min = st.sidebar.slider("Minimum N-Gram", 1, 5, 3)
+    ngram_max = st.sidebar.slider("Maximum N-Gram", ngram_min, 5, 4)
+    ngram_range = (ngram_min, ngram_max)
+
+    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
     if uploaded_file is not None:
-        # Read the uploaded file based on its type
-        if uploaded_file.type == 'text/plain':
-            uploaded_text = uploaded_file.read().decode()
-        elif uploaded_file.type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv']:
-            df = pd.read_excel(uploaded_file) if uploaded_file.type.endswith('sheet') else pd.read_csv(uploaded_file)
-            uploaded_text = ' '.join(df['text'].dropna().astype('str')) # Assuming the text is in the 'text' column
-        else:
-            st.warning("Unsupported file type")
-            uploaded_text = ""
-        
-        st.write(f"Performing {operation}...")
-        if operation == 'Text Classification':
-            user_labels = st.text_input("Enter the labels for classification (comma-separated):")
-            labels = user_labels.split(',')
-            classified_text = classify_text(uploaded_text, labels)
-            st.write("Classified Text:", classified_text)
-        elif operation == 'Summarization':
-            summarized_text, negative_count, positive_count = summarize_text(uploaded_text)
-            st.write("Summarized Text:", summarized_text)
-        elif operation == 'Topic Modeling':
-            topics = perform_topic_modeling(uploaded_text)
-            st.write("Topics:", topics)
-        elif operation == 'Thematic Analysis (n-grams)':
-            ngrams_list, ngrams_count = perform_thematic_analysis(uploaded_text)
-            st.write("N-grams Identified:", ngrams_list)
-            st.write("Frequency Count:", ngrams_count)
-    else:
-        st.write("Please upload a file first.")
+        df_ngram = thematic_analysis(uploaded_file, ngram_range)
+        st.write(df_ngram)
 
-# NLP Techniques Table
-nlp_techniques = pd.DataFrame({
-    'Analysis Type': ['Text Classification', 'Summarization', 'Topic Modeling', 'Thematic Analysis (n-grams)'],
-    'Summary': ['Classify text into user-defined labels', 'Summarize long texts into concise summaries', 'Identify main topics in a text', 'Analyze frequent word combinations (n-grams)'],
-    'Suggestions on how to use': ['Categorize documents, Sentiment analysis', 'Content summarization, Highlight generation', 'Content categorization, Theme discovery', 'Text pattern analysis, Keyword extraction']
-})
-st.table(nlp_techniques)
+# Text Classification Page
+elif selection == 'Text Classification':
+    st.title('Text Classification')
+
+    candidate_labels_input = st.text_input("Enter candidate labels, separated by commas (e.g., positive,negative,neutral):")
+    candidate_labels = candidate_labels_input.split(",") if candidate_labels_input else []
+
+    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+
+    if uploaded_file:
+        df = pd.read_excel(uploaded_file)
+        df = df[['text']].dropna()
+
+        if not candidate_labels:
+            # If no candidate labels are provided, use default labels
+            candidate_labels = ["positive", "negative", "neutral"]
+
+        classifier = pipeline(task="zero-shot-classification", model="facebook/bart-large-mnli")
+
+        res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
+
+        def make_table_data(res_list):
+            labels = []
+            seq = []
+            scores = []
+            for item in res_list:
+                labels.append(item['labels'][0])
+                seq.append(item['sequence'])
+                scores.append(item['scores'][0])
+
+            return seq, labels, scores
+
+        seq, labels, scores = make_table_data(res)
+
+        classified_text_neg_pos = pd.DataFrame(list(zip(seq, labels, scores)), columns=['Text', 'Label', 'Score'])
+        classified_text_normalized_neg_pos = pd.DataFrame(classified_text_neg_pos['Label'].value_counts(normalize=True))
+
+        st.write(classified_text_neg_pos)
+        st.write(classified_text_normalized_neg_pos)
+
+# Topic Modelling Page
+elif selection == 'Topic Modelling':
+    st.title('Topic Modelling')
+    # Upload file
+    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+    # Input for min and max value of topics
+    min_topics = st.slider("Select the Minimum Number of Topics", min_value=1, max_value=10, value=1)
+    max_topics = st.slider("Select the Maximum Number of Topics", min_value=min_topics, max_value=20, value=5)
+    no_top_words = st.slider("Select the Number of Top Words", min_value=1, max_value=50, value=20)
+
+    if uploaded_file:
+        df = pd.read_excel(uploaded_file)
+        df = df[['text']].dropna()
+        my_stopwords = stopwords.words('english')
+        word_rooter = WordNetLemmatizer().lemmatize
+        my_punctuation = '!"$%&\'()*+,-./:;<=>?[\\]^_`{|}~•@'
+
+        # cleaning master function
+        def clean_text(text, bigrams=False):
+            text = text.lower()  # lower case
+            text = re.sub('[' + re.escape(my_punctuation) + ']+', ' ', text)  # strip punctuation
+            text = re.sub('\s+', ' ', text)  # remove double spacing
+            text = re.sub('([0-9]+)', '', text)  # remove numbers
+            text_token_list = [word for word in text.split(' ')
+                               if word not in my_stopwords]  # remove stopwords
+
+            text_token_list = [word_rooter(word) if '#' not in word else word
+                               for word in text_token_list]  # apply word rooter
+            if bigrams:
+                text_token_list = text_token_list + [text_token_list[i] + '_' + text_token_list[i + 1]
+                                                     for i in range(len(text_token_list) - 1)]
+            text = ' '.join(text_token_list)
+            return text
+
+        df['clean_feeds'] = df.text.apply(clean_text)
+
+        # the vectorizer object will be used to transform text to vector form
+        vectorizer = CountVectorizer(token_pattern='\w+|\$[\d\.]+|\S+')
+        # apply transformation
+        tf = vectorizer.fit_transform(df['clean_feeds']).toarray()
+        # tf_feature_names tells us what word each column in the matrix represents
+        tf_feature_names = vectorizer.get_feature_names_out()
+
+        model = LatentDirichletAllocation(n_components=max_topics, random_state=0)
+        model.fit(tf)
+
+        def display_topics(model, feature_names, no_top_words):
+            topic_dict = {}
+            for topic_idx, topic in enumerate(model.components_):
+                topic_dict["Topic %d words" % (topic_idx)] = ['{}'.format(feature_names[i])
+                                                              for i in topic.argsort()[:-no_top_words - 1:-1]]
+                topic_dict["Topic %d weights" % (topic_idx)] = ['{:.1f}'.format(topic[i])
+                                                                for i in topic.argsort()[:-no_top_words - 1:-1]]
+            return pd.DataFrame(topic_dict)
+
+        topics = display_topics(model, tf_feature_names, no_top_words)
+        st.write(topics)
+elif selection == 'Topic MOdelling':
+    st.title('Toxicity Detection')
+    st.write("""
+    Topic Modelling
+    """)
