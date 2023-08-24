@@ -53,7 +53,11 @@ if selection == 'Getting Started':
     """)
 
 # Summarization Page
-elif selection == 'Summarization':
+elif selection == 'Sentiment':
+    st.title('Sentiment')
+    st.write("""
+    Sentiment
+    """)
 uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
 
 if uploaded_file is not None:
