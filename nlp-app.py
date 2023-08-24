@@ -54,16 +54,6 @@ if selection == 'Getting Started':
 
 # Summarization Page
 elif selection == 'Summarization':
-    st.title('Text Summarization')
-    st.write("""
-    Text summarization is the process of condensing a larger piece of text into a concise summary. 
-    It helps in extracting the essential information from a document, preserving only the most 
-    critical points. Summarization techniques can be abstractive or extractive, with large language 
-    models playing a significant role in generating human-like summaries.
-    """)
-
-# Summarization Page
-elif selection == 'Summarization':
 uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
 
 if uploaded_file is not None:
@@ -233,8 +223,4 @@ elif selection == 'Topic Modelling':
 
         topics = display_topics(model, tf_feature_names, no_top_words)
         st.write(topics)
-elif selection == 'Topic MOdelling':
-    st.title('Toxicity Detection')
-    st.write("""
-    Topic Modelling
-    """)
+
