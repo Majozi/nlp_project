@@ -49,14 +49,6 @@ uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column"
 if uploaded_file is not None:
     df_ngram = thematic_analysis(uploaded_file)
     st.write(df_ngram)
-    st.title('Getting Started with Large Language Models')
-    st.write("""
-    Large language models, particularly transformers, have revolutionized natural language processing (NLP). 
-    They enable various applications like translation, summarization, sentiment analysis, and more. 
-    Transformers are deep learning models that process words in relation to all other words in a sentence,
-    capturing complex relationships and structures. They're pre-trained on vast datasets and can be fine-tuned
-    for specific tasks. This introduction provides an overview of their capabilities and uses.
-    """)
 
 if selection == 'Sentiment':
     st.title("Sentiment Analysis")
