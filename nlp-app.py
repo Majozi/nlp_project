@@ -16,6 +16,16 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 nltk.download('stopwords')
 nltk.download('wordnet')
 
+bart_summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+t5_summarizer = pipeline("summarization", model="t5-base")
+
+def summarize_with_bart(text, min_length, max_length):
+    summary = bart_summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
+    return summary
+
+def summarize_with_t5(text, min_length, max_length):
+    summary = t5_summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
+    return summary
 
 # Function for thematic analysis
 def thematic_analysis(file, ngram_range):
@@ -50,6 +60,25 @@ if selection == 'Getting Started':
 Natural Language Processing (NLP) is a multifaceted field that integrates computer science, artificial intelligence, and linguistics to facilitate the interaction between computers and human language. In the context of higher education research, NLP plays a vital role in analyzing and synthesizing vast amounts of textual data. Researchers leverage NLP techniques to automatically grade assignments, detect plagiarism, and extract meaningful insights from academic texts. Moreover, NLP supports the summarization of extensive literature, the assessment of language proficiency, and the personalization of learning experiences. These applications not only enhance the efficiency and effectiveness of educational practices but also open new avenues for exploration and innovation in higher education. Through its ability to understand and process natural language, NLP is revolutionizing the way higher education institutions conduct research, teach, and engage with students.
     """)
 
+elif selection == 'Summarization':
+    st.title("Summarization")
+    uploaded_file = st.file_uploader("Choose a file")
+if uploaded_file is not None:
+    df = pd.read_excel(uploaded_file) # Replace with pd.read_excel for reading an Excel file
+    df = df[['text']].dropna().astype('str')
+    text_data = df['text'].tolist()
+
+    min_length = st.number_input('Minimum length', min_value=1, value=50)
+    max_length = st.number_input('Maximum length', min_value=min_length, value=200)
+
+    if st.button('Summarize'):
+        bart_summary = summarize_with_bart(text_data, min_length, max_length)
+        t5_summary = summarize_with_t5(text_data, min_length, max_length)
+
+        st.subheader('BART Summary')
+        st.write(bart_summary)
+        st.subheader('T5 Summary')
+        st.write(t5_summary)
 
 elif selection == 'Sentiment':
     st.title("Sentiment Analysis")
