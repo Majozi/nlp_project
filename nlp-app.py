@@ -188,7 +188,7 @@ elif selection == 'Topic Modelling':
         topics = display_topics(model, tf_feature_names, no_top_words)
         st.write(topics)
 
-elif selection == 'Thematic':
+elif selection == 'N-Grams (Thematic)':
     st.title("Thematic Analysis Using N-Grams")
     uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
 
