@@ -62,8 +62,8 @@ elif selection == 'Summarization':
     models playing a significant role in generating human-like summaries.
     """)
 
-st.title("Sentiment Analysis")
-
+# Summarization Page
+elif selection == 'Summarization':
 uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
 
 if uploaded_file is not None:
