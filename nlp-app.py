@@ -57,7 +57,7 @@ if selection == 'Getting Started':
 elif selection == 'Sentiment':
     st.title("Sentiment Analysis")
 
-uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
+    uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
 
 if uploaded_file is not None:
     df = pd.read_excel(uploaded_file)
