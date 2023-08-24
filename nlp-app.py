@@ -16,6 +16,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 nltk.download('stopwords')
 nltk.download('wordnet')
 
+uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
 # Function for thematic analysis
 def thematic_analysis(file, ngram_range):
     df = pd.read_excel(file)
@@ -57,7 +58,7 @@ if selection == 'Getting Started':
 elif selection == 'Sentiment':
     st.title("Sentiment Analysis")
 
-    uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
+    
 
 if uploaded_file is not None:
     df = pd.read_excel(uploaded_file)
@@ -92,13 +93,6 @@ if uploaded_file is not None:
 
     # Display the sentiment analysis results
     st.write(sentiment)
-
-    # Optionally, you can save the results to an Excel file
-    if st.button("Download as Excel"):
-        download_path = "nlp_analysis.xlsx"
-        with pd.ExcelWriter(download_path) as writer:
-            sentiment.to_excel(writer, sheet_name='sentiment')
-        st.success(f"File saved to {download_path}")
 
 # Text Classification Page
 elif selection == 'Text Classification':
