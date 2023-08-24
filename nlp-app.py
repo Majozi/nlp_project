@@ -46,11 +46,7 @@ selection = st.sidebar.radio("Go to", ['Getting Started', 'Summarization', 'Sent
 elif selection == 'Getting Started':
     st.title("Natural Language Processing")
     uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
-    st.write("""
-    
 
-Natural Language Processing (NLP) is a multifaceted field that integrates computer science, artificial intelligence, and linguistics to facilitate the interaction between computers and human language. In the context of higher education research, NLP plays a vital role in analyzing and synthesizing vast amounts of textual data. Researchers leverage NLP techniques to automatically grade assignments, detect plagiarism, and extract meaningful insights from academic texts. Moreover, NLP supports the summarization of extensive literature, the assessment of language proficiency, and the personalization of learning experiences. These applications not only enhance the efficiency and effectiveness of educational practices but also open new avenues for exploration and innovation in higher education. Through its ability to understand and process natural language, NLP is revolutionizing the way higher education institutions conduct research, teach, and engage with students.
-    """)
 
 if selection == 'Sentiment':
     st.title("Sentiment Analysis")
