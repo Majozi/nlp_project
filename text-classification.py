@@ -1,38 +1,54 @@
 import streamlit as st
 import pandas as pd
-from sklearn.cluster import KMeans
-from transformers import pipeline, BertTokenizer, BertModel
-import numpy as np
-from scipy.spatial.distance import cdist
-import base64
+from transformers import pipeline
+import matplotlib.pyplot as plt
 
-def classification():
-    candidate_labels_input = st.text_input("Enter candidate labels, separated by commas (e.g., positive,negative):")
-    candidate_labels = candidate_labels_input.split(",") if candidate_labels_input else []
+def make_table_data(res_list):
+    labels = []
+    seq = []
+    scores = []
+    for item in res_list:
+        labels.append(item['labels'])
+        seq.append(item['sequence'])
+        scores.append(item['scores'])
 
-    uploaded_file = st.file_uploader("Choose a file")
-    if uploaded_file:
-        df = pd.read_excel(uploaded_file)
-        df = df[['text']].dropna()
+    return seq, labels, scores
 
-        if not candidate_labels:
-            candidate_labels = ["positive", "negative"]
+# Streamlit app
+st.title('Text Classification')
 
-        classifier = pipeline(task="zero-shot-classification", model="facebook/bart-large-mnli")
+# Get candidate labels from user
+candidate_labels = st.text_input('Enter Candidate Labels (comma separated)', 'positive,negative,neutral')
+candidate_labels = candidate_labels.split(",")
 
-        res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
-        
-        # The rest of the code is similar to the Flask version, processing the results and displaying them
+# File upload
+uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
 
-        # ...
+if uploaded_file is not None:
+    df = pd.read_excel(uploaded_file)
+    df = df[['text']].dropna()
 
-        # Assuming you have the final DataFrames ready, you can display them as tables:
-        st.write(classified_text_neg_pos_sample)
-        st.write(classified_text_normalized_neg_pos)
-        st.write(bert_classification_sample)
+    if not candidate_labels:
+        candidate_labels = ["positive", "negative", "neutral"]
 
-        # You can also provide download links for the Excel files:
-        # ...
+    classifier = pipeline(
+        task="zero-shot-classification",
+        model="facebook/bart-large-mnli"
+    )
 
-if __name__ == '__main__':
-    classification()
+    res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
+    seq, labels, scores = make_table_data(res)
+
+    classified_text_neg_pos = pd.DataFrame(list(zip(seq, labels, scores)), columns=['Text', 'Label', 'Score'])
+
+    # Display a sample of the result
+    st.write("Sample Results:")
+    st.write(classified_text_neg_pos.head(3))
+
+    # Display normalized results as a pie chart
+    classified_text_normalized_neg_pos = pd.DataFrame(classified_text_neg_pos['Label'].value_counts(normalize=True))
+    fig, ax = plt.subplots()
+    ax.pie(classified_text_normalized_neg_pos['Label'], labels=classified_text_normalized_neg_pos.index, autopct='%1.1f%%')
+    ax.axis('equal')
+    st.write("Normalized Results:")
+    st.pyplot(fig)
