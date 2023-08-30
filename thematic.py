@@ -40,3 +40,12 @@ n-grams occur in your data. \n \n Use the slider to control the number of 'grams
 if uploaded_file is not None:
     df_ngram = thematic_analysis(uploaded_file, ngram_min, ngram_max)
     st.write(df_ngram)
+    # Plotting the top 15 n-grams
+    top_ngrams = df_ngram.head(15)
+    plt.figure(figsize=(10, 6))
+    plt.barh(top_ngrams['ngram'], top_ngrams['frequency'], color='skyblue')
+    plt.xlabel('Frequency')
+    plt.ylabel('N-grams')
+    plt.title('Top 15 N-grams')
+    plt.gca().invert_yaxis()
+    st.pyplot()
