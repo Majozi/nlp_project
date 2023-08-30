@@ -53,31 +53,4 @@ if uploaded_file is not None:
         )
 
         st.altair_chart(chart)
-         # Option to download the chart
-        st.markdown("""
-            <a href="javascript:downloadSvg()">Download Chart as PNG</a>
-            <script>
-                function downloadSvg() {
-                    var svgElement = document.querySelector('svg');
-                    var svgString = new XMLSerializer().serializeToString(svgElement);
-                    var canvas = document.createElement('canvas');
-                    var ctx = canvas.getContext('2d');
-                    var DOMURL = self.URL || self.webkitURL || self;
-                    var img = new Image();
-                    var svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-                    var url = DOMURL.createObjectURL(svgBlob);
-                    img.onload = function() {
-                        ctx.drawImage(img, 0, 0);
-                        var png = canvas.toDataURL('image/png');
-                        var dlLink = document.createElement('a');
-                        dlLink.download = 'chart.png';
-                        dlLink.href = png;
-                        dlLink.dataset.downloadurl = ['image/png', dlLink.download, dlLink.href].join(':');
-                        document.body.appendChild(dlLink);
-                        dlLink.click();
-                        document.body.removeChild(dlLink);
-                    };
-                    img.src = url;
-                }
-            </script>
-        """, unsafe_allow_html=True)
+         
