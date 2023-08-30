@@ -8,6 +8,13 @@ from nltk.corpus import stopwords
 import nltk
 nltk.download('stopwords')
 
+# Function to download data as a CSV file
+def download_csv(df):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="ngrams.csv">Download CSV File</a>'
+    return href
+
 def thematic_analysis(file, ngram_min, ngram_max):
     df = pd.read_excel(file)
     df = df[['text']].dropna()
@@ -46,3 +53,31 @@ if uploaded_file is not None:
         )
 
         st.altair_chart(chart)
+         # Option to download the chart
+        st.markdown("""
+            <a href="javascript:downloadSvg()">Download Chart as PNG</a>
+            <script>
+                function downloadSvg() {
+                    var svgElement = document.querySelector('svg');
+                    var svgString = new XMLSerializer().serializeToString(svgElement);
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    var DOMURL = self.URL || self.webkitURL || self;
+                    var img = new Image();
+                    var svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+                    var url = DOMURL.createObjectURL(svgBlob);
+                    img.onload = function() {
+                        ctx.drawImage(img, 0, 0);
+                        var png = canvas.toDataURL('image/png');
+                        var dlLink = document.createElement('a');
+                        dlLink.download = 'chart.png';
+                        dlLink.href = png;
+                        dlLink.dataset.downloadurl = ['image/png', dlLink.download, dlLink.href].join(':');
+                        document.body.appendChild(dlLink);
+                        dlLink.click();
+                        document.body.removeChild(dlLink);
+                    };
+                    img.src = url;
+                }
+            </script>
+        """, unsafe_allow_html=True)
