@@ -45,7 +45,7 @@ image_url = "https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png"
 st.image(image_url, width=100)
 
 # Top Navigation
-st.sidebar.title('Navigation')
+st.sidebar.title('Text Analytics')
 selection = st.sidebar.radio("Go to", ['Getting Started', 'Summarization', 'Sentiment', 'Toxicity', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling'])
 
 if selection == 'Getting Started':
@@ -195,10 +195,10 @@ elif selection == 'Topic Modelling':
 elif selection == 'N-Grams (Thematic)':
     st.title("Thematic Analysis Using N-Grams")
     st.write("""
-**How to use this analysis:** \n Once the analysis is done, group similar ideas in the table below to get the themes. You can also copy the table and paste it to ChatGPT and use a prompt to get the themes. To flesh them out in your discussion, go back to your original data and search these words to get more insight. When creating a theme, 
-remember to get a sum of all the bigrams/trigrams that you combined so that you may Quantify your argument. \n \n **PLEASE NOTE THIS**: The table below doesn't represent the number of responses, but the number of times the
-bigrams/trigrams occur on your data.
-""")
+    **How to use this analysis:** \n Once the analysis is done, group similar ideas in the table below to get the themes. You can also copy the table and paste it to ChatGPT and use a prompt to get the themes. To flesh them out in your discussion, go back to your original data and search these words to get more insight. When creating a theme, 
+    remember to get a sum of all the bigrams/trigrams that you combined so that you may Quantify your argument. \n \n **PLEASE NOTE THIS**: The table below doesn't represent the number of responses, but the number of times the
+    bigrams/trigrams occur on your data.
+    """)
 uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
 
 ngram_min = st.slider("Minimum N-gram Range", 1, 5, 2)
