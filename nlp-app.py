@@ -24,18 +24,17 @@ def download_csv(df):
     href = f'<a href="data:file/csv;base64,{b64}" download="ngrams.csv">Download CSV File</a>'
     return href
 
-def thematic_analysis(file):
-    df = pd.read_excel(file)  # Reading the Excel file
+def thematic_analysis(file, ngram_min, ngram_max):
+    df = pd.read_excel(file)
     df = df[['text']].dropna()
-
+    
     stoplist = stopwords.words('english')
-    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(2, 4))
+    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(ngram_min, ngram_max))
     ngrams = c_vec.fit_transform(df['text'])
     count_values = ngrams.toarray().sum(axis=0)
     vocab = c_vec.vocabulary_
 
-    df_ngram = pd.DataFrame(sorted([(count_values[i], k) for k, i in vocab.items()],
-                                   reverse=True)).rename(columns={0: 'frequency', 1: 'bigram/trigram'})
+    df_ngram = pd.DataFrame(sorted([(count_values[i], k) for k, i in vocab.items()], reverse=True)).rename(columns={0: 'frequency', 1: 'ngram'})
 
     return df_ngram
 
@@ -220,4 +219,5 @@ if uploaded_file is not None:
             title='Top 25 N-grams',
             width=600
         )
-        st.altair_chart(chart)        
+
+        st.altair_chart(chart)  
