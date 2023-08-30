@@ -7,6 +7,7 @@ from transformers import pipeline
 from nltk.stem import WordNetLemmatizer
 from sklearn.decomposition import LatentDirichletAllocation
 import re
+import altair as alt
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import Trainer
 import numpy as np
