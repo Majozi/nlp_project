@@ -41,14 +41,14 @@ if uploaded_file is not None:
     st.write(df_ngram)
 
     if df_ngram is not None and not df_ngram.empty:
-        top_ngrams = df_ngram.head(15)
+        top_ngrams = df_ngram.head(25)
 
         chart = alt.Chart(top_ngrams).mark_bar().encode(
             y=alt.Y('ngram:O', sort='-x'),
             x='frequency:Q',
             tooltip=['ngram', 'frequency']
         ).properties(
-            title='Top 15 N-grams',
+            title='Top 25 N-grams',
             width=600
         )
 
