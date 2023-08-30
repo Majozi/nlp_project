@@ -199,7 +199,7 @@ elif selection == 'N-Grams (Thematic)':
 remember to get a sum of all the bigrams/trigrams that you combined so that you may Quantify your argument. \n \n **PLEASE NOTE THIS**: The table below doesn't represent the number of responses, but the number of times the
 bigrams/trigrams occur on your data.
 """)
-    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
 
 ngram_min = st.slider("Minimum N-gram Range", 1, 5, 2)
 ngram_max = st.slider("Maximum N-gram Range", ngram_min, 5, 4)
