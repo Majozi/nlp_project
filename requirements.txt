@@ -13,4 +13,4 @@ torch
 matplotlib
 werkzeug
 scipy
-
+altair
