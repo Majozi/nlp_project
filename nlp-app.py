@@ -189,6 +189,11 @@ elif selection == 'Topic Modelling':
 
 elif selection == 'N-Grams (Thematic)':
     st.title("Thematic Analysis Using N-Grams")
+    st.write("""
+Group the items in the table below to get the themes. To flesh them out in your discussion, go back to your original data and search these words to get more insight. When creating a theme, 
+remember to get a sum of all the bigrams/trigrams that you combined so that you may Quantify your argument. PLEASE NOTE THIS: The table below doesn't represent the number of responses, but the number of times the
+bigrams/trigrams occur on your data.
+""")
     uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
     
     if uploaded_file is not None:
