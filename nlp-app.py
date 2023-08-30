@@ -219,6 +219,4 @@ if uploaded_file is not None:
             title='Top 25 N-grams',
             width=600
         )
-
-        st.altair_chart(chart)
-         
+        st.altair_chart(chart)        
