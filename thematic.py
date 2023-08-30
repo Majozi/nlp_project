@@ -41,14 +41,6 @@ if uploaded_file is not None:
     df_ngram = thematic_analysis(uploaded_file, ngram_min, ngram_max)
     st.write(df_ngram)
 
-    if df_ngram is not None and not df_ngram.empty:  # Check if df_ngram is not empty
-        # Plotting the top 15 n-grams
-        top_ngrams = df_ngram.head(15)
-        
-        plt.figure(figsize=(10, 6))  # This is line 45
-        plt.barh(top_ngrams['ngram'], top_ngrams['frequency'], color='skyblue')
-        plt.xlabel('Frequency')
-        plt.ylabel('N-grams')
-        plt.title('Top 15 N-grams')
-        plt.gca().invert_yaxis()
-        st.pyplot()
+    if df_ngram is not None and not df_ngram.empty:
+        top_ngrams = df_ngram.head(15).set_index('ngram')
+        st.bar_chart(top_ngrams)
