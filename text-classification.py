@@ -1,31 +1,10 @@
 import streamlit as st
 import pandas as pd
 from transformers import pipeline
-import matplotlib.pyplot as plt
 
-def make_table_data(res_list):
-    labels = []
-    seq = []
-    scores = []
-    for item in res_list:
-        labels.append(item['labels'])
-        seq.append(item['sequence'])
-        scores.append(item['scores'])
-
-    return seq, labels, scores
-
-# Streamlit app
-st.title('Text Classification')
-
-# Get candidate labels from user
-candidate_labels = st.text_input('Enter Candidate Labels (comma separated)', 'positive,negative,neutral')
-candidate_labels = candidate_labels.split(",")
-
-# File upload
-uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx'])
-
-if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file)
+# Function to process the text and classify it
+def classify_text(file, candidate_labels):
+    df = pd.read_excel(file)
     df = df[['text']].dropna()
 
     if not candidate_labels:
@@ -37,18 +16,36 @@ if uploaded_file is not None:
     )
 
     res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
-    seq, labels, scores = make_table_data(res)
 
-    classified_text_neg_pos = pd.DataFrame(list(zip(seq, labels, scores)), columns=['Text', 'Label', 'Score'])
+    labels = []
+    seq = []
+    scores = []
 
-    # Display a sample of the result
-    st.write("Sample Results:")
-    st.write(classified_text_neg_pos.head(3))
+    for item in res:
+        labels.append(item['labels'][0])  # Assuming the first label is the most likely one
+        seq.append(item['sequence'])
+        scores.append(item['scores'][0])  # Assuming the first score is the most likely one
 
-    # Display normalized results as a pie chart
-    classified_text_normalized_neg_pos = pd.DataFrame(classified_text_neg_pos['Label'].value_counts(normalize=True))
-    fig, ax = plt.subplots()
-    ax.pie(classified_text_normalized_neg_pos['Label'], labels=classified_text_normalized_neg_pos.index, autopct='%1.1f%%')
-    ax.axis('equal')
-    st.write("Normalized Results:")
-    st.pyplot(fig)
+    classified_text = pd.DataFrame(list(zip(seq, labels, scores)), columns=['Text', 'Label', 'Score'])
+    classified_text_normalized = pd.DataFrame(classified_text['Label'].value_counts(normalize=True))
+
+    return classified_text, classified_text_normalized
+
+# Streamlit App
+st.title('Text Classification')
+
+# Upload the Excel file
+file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+
+# Input for candidate labels
+candidate_labels_input = st.text_input("Candidate Labels (comma separated)", "positive,negative,neutral")
+candidate_labels = [x.strip() for x in candidate_labels_input.split(",")]
+
+if file:
+    classified_text, classified_text_normalized = classify_text(file, candidate_labels)
+
+    st.write("### Classified Text Sample")
+    st.table(classified_text.head(3))
+
+    st.write("### Label Distribution")
+    st.bar_chart(classified_text_normalized)
