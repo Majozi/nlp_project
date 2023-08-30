@@ -199,25 +199,25 @@ elif selection == 'N-Grams (Thematic)':
     remember to get a sum of all the bigrams/trigrams that you combined so that you may Quantify your argument. \n \n **PLEASE NOTE THIS**: The table below doesn't represent the number of responses, but the number of times the
     bigrams/trigrams occur on your data.
     """)
-uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
-
-ngram_min = st.slider("Minimum N-gram Range", 1, 5, 2)
-ngram_max = st.slider("Maximum N-gram Range", ngram_min, 5, 4)
-
-if uploaded_file is not None:
-    df_ngram = thematic_analysis(uploaded_file, ngram_min, ngram_max)
-    st.write(df_ngram)
-
-    if df_ngram is not None and not df_ngram.empty:
-        top_ngrams = df_ngram.head(25)
-
-        chart = alt.Chart(top_ngrams).mark_bar().encode(
-            y=alt.Y('ngram:O', sort='-x'),
-            x='frequency:Q',
-            tooltip=['ngram', 'frequency']
-        ).properties(
-            title='Top 25 N-grams',
-            width=600
-        )
-
-        st.altair_chart(chart)  
+    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+    
+    ngram_min = st.slider("Minimum N-gram Range", 1, 5, 2)
+    ngram_max = st.slider("Maximum N-gram Range", ngram_min, 5, 4)
+    
+    if uploaded_file is not None:
+        df_ngram = thematic_analysis(uploaded_file, ngram_min, ngram_max)
+        st.write(df_ngram)
+    
+        if df_ngram is not None and not df_ngram.empty:
+            top_ngrams = df_ngram.head(25)
+    
+            chart = alt.Chart(top_ngrams).mark_bar().encode(
+                y=alt.Y('ngram:O', sort='-x'),
+                x='frequency:Q',
+                tooltip=['ngram', 'frequency']
+            ).properties(
+                title='Top 25 N-grams',
+                width=600
+            )
+    
+            st.altair_chart(chart)  
