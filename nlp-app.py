@@ -16,7 +16,12 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-
+# Function to download data as a CSV file
+def download_csv(df):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="ngrams.csv">Download CSV File</a>'
+    return href
 
 def thematic_analysis(file):
     df = pd.read_excel(file)  # Reading the Excel file
@@ -195,8 +200,25 @@ remember to get a sum of all the bigrams/trigrams that you combined so that you 
 bigrams/trigrams occur on your data.
 """)
     uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
-    
-    if uploaded_file is not None:
-        df_ngram = thematic_analysis(uploaded_file)
-        st.write(df_ngram)
 
+ngram_min = st.slider("Minimum N-gram Range", 1, 5, 2)
+ngram_max = st.slider("Maximum N-gram Range", ngram_min, 5, 4)
+
+if uploaded_file is not None:
+    df_ngram = thematic_analysis(uploaded_file, ngram_min, ngram_max)
+    st.write(df_ngram)
+
+    if df_ngram is not None and not df_ngram.empty:
+        top_ngrams = df_ngram.head(25)
+
+        chart = alt.Chart(top_ngrams).mark_bar().encode(
+            y=alt.Y('ngram:O', sort='-x'),
+            x='frequency:Q',
+            tooltip=['ngram', 'frequency']
+        ).properties(
+            title='Top 25 N-grams',
+            width=600
+        )
+
+        st.altair_chart(chart)
+         
