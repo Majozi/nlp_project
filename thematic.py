@@ -34,7 +34,7 @@ ngram_max = st.slider("Maximum N-gram Range", ngram_min, 5, 4)  # Make sure max 
 st.write("""
 Group the items in the table below to get the themes. To flesh them out in your discussion, go back to your original data and search these words to get more insight. When creating a theme, 
 remember to get a sum of all the bigrams/trigrams that you combined so that you may quantify your argument. PLEASE NOTE THIS: The table below doesn't represent the number of responses, but the number of times the
-n-grams occur in your data.
+n-grams occur in your data. \n \n Use the slider to control the number of 'grams'.
 """)
 
 if uploaded_file is not None:
