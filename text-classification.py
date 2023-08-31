@@ -8,23 +8,26 @@ def classify_text(file, candidate_labels):
     try:
         # Read the Excel file into a DataFrame
         df = pd.read_excel(file)
+        st.write("Excel file read successfully.")  # Debugging line
         
         # Check if 'text' column exists
         if 'text' not in df.columns:
             st.error("The Excel file must contain a 'text' column.")
             return None, None
 
-        # Drop NaN values from the 'text' column
         df = df[['text']].dropna()
+        st.write(f"Data contains {len(df)} non-empty rows.")  # Debugging line
 
         # Initialize the zero-shot classifier
         classifier = pipeline(
             task="zero-shot-classification",
             model="facebook/bart-large-mnli"
         )
+        st.write("Classifier initialized.")  # Debugging line
 
         # Perform classification
         res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
+        st.write("Classification completed.")  # Debugging line
 
         labels = []
         seq = []
@@ -35,7 +38,6 @@ def classify_text(file, candidate_labels):
             seq.append(item['sequence'])
             scores.append(item['scores'][0])
 
-        # Create a DataFrame to store the results
         classified_text = pd.DataFrame(list(zip(seq, labels, scores)), columns=['Text', 'Label', 'Score'])
         classified_text_normalized = pd.DataFrame(classified_text['Label'].value_counts(normalize=True))
 
