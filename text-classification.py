@@ -1,75 +1,50 @@
 import streamlit as st
 import pandas as pd
 from transformers import pipeline
-import matplotlib.pyplot as plt
 
-# Function to process the text and classify it
-def classify_text(file, candidate_labels):
+# Title and description
+st.title("Zero-Shot Classification Streamlit App")
+st.write("Upload a CSV or Excel file with a column named 'text' to get zero-shot classification results.")
+
+# Initialize zero-shot-classification pipeline
+classifier = pipeline("zero-shot-classification", model="distilbert-base-uncased-finetuned-mnli")
+
+# User-defined labels for classification
+label1 = st.text_input("Enter Label 1:")
+label2 = st.text_input("Enter Label 2:")
+label3 = st.text_input("Enter Label 3:")
+label4 = st.text_input("Enter Label 4:")
+label5 = st.text_input("Enter Label 5:")
+
+labels = [label for label in [label1, label2, label3, label4, label5] if label]
+
+# Upload file
+uploaded_file = st.file_uploader("Choose a file", type=["csv", "xlsx"])
+
+if uploaded_file:
     try:
-        # Read the Excel file into a DataFrame
-        df = pd.read_excel(file)
-        st.write("Excel file read successfully.")  # Debugging line
+        # Read the uploaded file into a DataFrame
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        elif uploaded_file.name.endswith('.xlsx'):
+            df = pd.read_excel(uploaded_file)
         
         # Check if 'text' column exists
         if 'text' not in df.columns:
-            st.error("The Excel file must contain a 'text' column.")
-            return None, None
-
-        df = df[['text']].dropna()
-        st.write(f"Data contains {len(df)} non-empty rows.")  # Debugging line
-
-        # Initialize the zero-shot classifier
-        classifier = pipeline(
-            task="zero-shot-classification",
-            model="facebook/bart-large-mnli"
-        )
-        st.write("Classifier initialized.")  # Debugging line
-
-        # Perform classification
-        res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
-        st.write("Classification completed.")  # Debugging line
-
-        labels = []
-        seq = []
-        scores = []
-
-        for item in res:
-            labels.append(item['labels'][0])
-            seq.append(item['sequence'])
-            scores.append(item['scores'][0])
-
-        classified_text = pd.DataFrame(list(zip(seq, labels, scores)), columns=['Text', 'Label', 'Score'])
-        classified_text_normalized = pd.DataFrame(classified_text['Label'].value_counts(normalize=True))
-
-        return classified_text, classified_text_normalized
-
+            st.error("No 'text' column found in the uploaded file.")
+        else:
+            results_list = []
+            
+            # Perform zero-shot classification and store the results
+            for text in df['text']:
+                result = classifier(text, labels)
+                results_list.append(result['labels'][0])  # Most likely label
+                
+            # Add the results to the DataFrame
+            df['classification_result'] = results_list
+            
+            # Display the updated DataFrame
+            st.write(df)
+            
     except Exception as e:
         st.error(f"An error occurred: {e}")
-        return None, None
-
-# Streamlit App UI
-st.title('Text Classification')
-
-# Upload the Excel file
-file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
-
-if file:
-    with st.form(key='analysis_form'):
-        # Input for candidate labels
-        candidate_labels_input = st.text_input("Candidate Labels (comma separated)", "positive,negative,neutral")
-        
-        # Submit button
-        submitted = st.form_submit_button("Start Analysis")
-
-    if submitted:
-        candidate_labels = [x.strip() for x in candidate_labels_input.split(",")]
-
-        classified_text, classified_text_normalized = classify_text(file, candidate_labels)
-
-        if classified_text is not None:
-            st.write("### Classified Text Sample")
-            st.table(classified_text.head(3))
-
-        if classified_text_normalized is not None:
-            st.write("### Label Distribution")
-            st.pyplot(classified_text_normalized.plot.pie(y='Label', autopct='%1.1f%%', legend=False))
