@@ -22,7 +22,7 @@ labels = st.text_input(' **Enter your classification labels, separated by comma*
 labels = [label.strip() for label in labels.split(',')]
 
 # File Upload
-uploaded_file = st.file_uploader("Upload CSV or Excel", type=['csv', 'xlsx'])
+uploaded_file = st.file_uploader("Upload CSV or Excel with a column 'text' ", type=['csv', 'xlsx'])
 
 if uploaded_file is not None:
     try:
