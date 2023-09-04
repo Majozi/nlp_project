@@ -358,28 +358,28 @@ min_length = st.sidebar.slider("Minimum Length", 10, 100, 30)
 max_length = st.sidebar.slider("Maximum Length", 50, 300, 100)
 
 #Summarization
-elif selection == 'N-Grams (Summarization)':
+elif selection == 'Summarization':
     st.title("Summarization")
     st.write("""
     
     """)
     uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
 
-if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file)
-    if 'text' not in df.columns:
-        st.error("Please make sure the Excel file contains a 'text' column.")
-    else:
-        df = df[['text']].dropna().astype('str')
-        text_list = df['text'].tolist()
-
-        # Summarize the text
-        bart_summaries, t5_summaries = summarize_text(text_list, min_length, max_length)
-
-        result_df = pd.DataFrame({
-            "Original Text": text_list,
-            "BART Summary": bart_summaries,
-            "T5 Summary": t5_summaries
-        })
-
-        st.write(result_df)
+    if uploaded_file is not None:
+        df = pd.read_excel(uploaded_file)
+        if 'text' not in df.columns:
+            st.error("Please make sure the Excel file contains a 'text' column.")
+        else:
+            df = df[['text']].dropna().astype('str')
+            text_list = df['text'].tolist()
+    
+            # Summarize the text
+            bart_summaries, t5_summaries = summarize_text(text_list, min_length, max_length)
+    
+            result_df = pd.DataFrame({
+                "Original Text": text_list,
+                "BART Summary": bart_summaries,
+                "T5 Summary": t5_summaries
+            })
+    
+            st.write(result_df)
