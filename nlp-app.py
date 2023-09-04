@@ -202,14 +202,33 @@ elif selection == 'Text Classification':
     First, run the word cloud and the N-GRAM analysis so you can identify the big ideas. You can modify the words / phrases to get the best results. \n
     When breaking the data into fragments, just be aware that the analysis will be based on the fragment and may not be representative of the whole part.
     """)
+   # Custom CSS for download buttons
+    st.markdown("""
+    <style>
+    .download-btn {
+        background-color: #c48939;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+    }
+    .download-btn:hover {
+        background-color: #005baa;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Define user input for Classification Labels
-    labels = st.text_input(' **Enter your classification labels, separated by comma** ')
+    labels = st.text_input('Enter your classification labels, separated by comma')
     
     # Split the labels into a list
     labels = [label.strip() for label in labels.split(',')]
     
     # File Upload
-    uploaded_file = st.file_uploader("Upload CSV or Excel with a column 'text' ", type=['csv', 'xlsx'])
+    uploaded_file = st.file_uploader("Upload CSV or Excel", type=['csv', 'xlsx'])
     
     if uploaded_file is not None:
         try:
@@ -240,7 +259,7 @@ elif selection == 'Text Classification':
                 return pd.Series([result['labels'][0], result['scores'][0]], index=['label', 'score'])
             
             df[['label', 'score']] = df['text'].apply(lambda x: classify(x, labels))
-            
+    
             # Normalize the labels and calculate frequency distribution
             label_counts = df['label'].value_counts(normalize=True)
             
@@ -250,14 +269,29 @@ elif selection == 'Text Classification':
             # Pie chart
             fig, ax = plt.subplots()
             ax.pie(label_counts, labels=label_counts.index, autopct='%1.1f%%', startangle=90, colors=['#005baa', '#c48939', '#d61c33'])
-            ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+            ax.axis('equal')
             
             # Remove background
             ax.set_facecolor('none')
             fig.patch.set_visible(False)
+    
+            # Convert the Matplotlib figure to a BytesIO object
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png')
+            buffer.seek(0)
             
+            # Convert DataFrame to CSV and encode
+            csv = df.to_csv(index=False)
+            csv_base64 = base64.b64encode(csv.encode()).decode()
+    
+            # Custom download buttons
+            st.markdown(f'<a href="data:text/csv;base64,{csv_base64}" download="classified_data.csv" class="download-btn"><i class="fas fa-download"></i> Download Data as CSV</a>', unsafe_allow_html=True)
+            st.markdown(f'<a href="data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}" download="label_distribution.png" class="download-btn"><i class="fas fa-download"></i> Download Pie Chart</a>', unsafe_allow_html=True)
+    
+            # Display pie chart
             st.pyplot(fig)
     
+            # Display DataFrame
             st.write(df)
     
 
