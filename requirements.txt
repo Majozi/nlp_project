@@ -17,3 +17,6 @@ scipy
 altair
 detoxify
 torchtext
+gensim
+spacy
+wordcloud
