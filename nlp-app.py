@@ -228,7 +228,7 @@ elif selection == 'Text Classification':
     labels = [label.strip() for label in labels.split(',')]
     
     # File Upload
-    uploaded_file = st.file_uploader("Upload CSV or Excel", type=['csv', 'xlsx'])
+    uploaded_file = st.file_uploader(" **Upload CSV or Excel with a column name 'text'. ** ", type=['csv', 'xlsx'])
     
     if uploaded_file is not None:
         try:
@@ -285,12 +285,13 @@ elif selection == 'Text Classification':
             csv_base64 = base64.b64encode(csv.encode()).decode()
     
             # Custom download buttons
-            st.markdown(f'<a href="data:text/csv;base64,{csv_base64}" download="classified_data.csv" class="download-btn"><i class="fas fa-download"></i> Download Data as CSV</a>', unsafe_allow_html=True)
+            
             st.markdown(f'<a href="data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}" download="label_distribution.png" class="download-btn"><i class="fas fa-download"></i> Download Pie Chart</a>', unsafe_allow_html=True)
     
             # Display pie chart
             st.pyplot(fig)
-    
+
+            st.markdown(f'<a href="data:text/csv;base64,{csv_base64}" download="classified_data.csv" class="download-btn"><i class="fas fa-download"></i> Download Data as CSV</a>', unsafe_allow_html=True)
             # Display DataFrame
             st.write(df)
     
