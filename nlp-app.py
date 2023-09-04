@@ -330,7 +330,5 @@ elif selection == 'N-Grams (Thematic)':
             )
     
             st.altair_chart(chart)  
-
-            })
     
             st.write(result_df)
