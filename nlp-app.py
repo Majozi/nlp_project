@@ -79,15 +79,15 @@ elif selection == 'Sentiment':
     classifier = pipeline('sentiment-analysis')
     
     st.write("""
-             **TIPS FOR USE:** \n After the analysis has been completed, download the table below and read through a sample of responses to get a feel of
-             how accurate the classification was. A rule of thumb is to always pay attention to rows where the 
-             score is below 50 and the sentiment is negative and the score is close to 100%. \n \n
-             An overall positive sentiment that is below 50% (depending on the question asked), may be
-             an immediate indicator of issues to be addressed. To find these, filter for a score above 75%
-             and a negative label. \n \n
-             Be mindful that you may have to reclassify and then recalculate the overall sentiment.
-             """)
-    
+         **TIPS FOR USE:** \n After the analysis has been completed, download the table below and read through a sample of responses to get a feel of
+         how accurate the classification was. A rule of thumb is to always pay attention to rows where the 
+         score is below 50 and the sentiment is negative and the score is close to 100%. \n 
+         An overall positive sentiment that is below 50% (depending on the question asked), may be
+         an immediate indicator of issues to be addressed. To find these, filter for a score above 75%
+         and a negative label. \n
+         Be mindful that you may have to reclassify and then recalculate the overall sentiment.
+         """)
+
     # File Upload
     uploaded_file = st.file_uploader("Upload CSV or Excel with a column name 'text'.", type=['csv', 'xlsx'])
     
@@ -100,9 +100,15 @@ elif selection == 'Sentiment':
         if 'text' not in df.columns:
             st.markdown('File does not have a `text` column. Please upload another.')
         else:
-            # Perform Text Classification
-            df['label'] = df['text'].apply(lambda x: classifier(x)[0]['label'])
-            df['score'] = df['text'].apply(lambda x: classifier(x)[0]['score']) * 100
+            # Drop NaN or empty values and ensure the 'text' column contains strings
+            df.dropna(subset=['text'], inplace=True)
+            df['text'] = df['text'].astype(str)
+    
+            # Perform Text Classification in a batch
+            classified_text = classifier(df['text'].tolist())
+            
+            df['label'] = [item['label'] for item in classified_text]
+            df['score'] = [item['score'] * 100 for item in classified_text]
     
             st.write(df)
     
@@ -124,46 +130,6 @@ elif selection == 'Sentiment':
     
             # Download Pie Chart
             st.markdown(get_pie_chart_download_link(fig), unsafe_allow_html=True)
-    
-    # Text Classification Page
-    elif selection == 'Text Classification':
-        st.title('Text Classification')
-    
-        candidate_labels_input = st.text_input("Enter candidate labels, separated by commas (e.g., positive,negative,neutral):")
-        candidate_labels = candidate_labels_input.split(",") if candidate_labels_input else []
-    
-        uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
-    
-        if uploaded_file:
-            df = pd.read_excel(uploaded_file)
-            df = df[['text']].dropna()
-    
-            if not candidate_labels:
-                # If no candidate labels are provided, use default labels
-                candidate_labels = ["positive", "negative", "neutral"]
-    
-            classifier = pipeline(task="zero-shot-classification", model="facebook/bart-large-mnli")
-    
-            res = classifier(df['text'].tolist(), candidate_labels=candidate_labels)
-    
-            def make_table_data(res_list):
-                labels = []
-                seq = []
-                scores = []
-                for item in res_list:
-                    labels.append(item['labels'][0])
-                    seq.append(item['sequence'])
-                    scores.append(item['scores'][0])
-    
-                return seq, labels, scores
-    
-            seq, labels, scores = make_table_data(res)
-    
-            classified_text_neg_pos = pd.DataFrame(list(zip(seq, labels, scores)), columns=['Text', 'Label', 'Score'])
-            classified_text_normalized_neg_pos = pd.DataFrame(classified_text_neg_pos['Label'].value_counts(normalize=True))
-    
-            st.write(classified_text_neg_pos)
-            st.write(classified_text_normalized_neg_pos)
 
 # Topic Modelling Page
 elif selection == 'Topic Modelling':
