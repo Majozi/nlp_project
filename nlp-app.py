@@ -82,6 +82,10 @@ def thematic_analysis(file, ngram_min, ngram_max):
 
     return df_ngram
 
+st.sidebar.title("Summarization Parameters")
+min_length = st.sidebar.slider("Minimum Length", 10, 100, 30)
+max_length = st.sidebar.slider("Maximum Length", 50, 300, 100)
+
 # Image URL
 image_url = "https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png"
 
@@ -353,16 +357,12 @@ elif selection == 'N-Grams (Thematic)':
     
             st.altair_chart(chart)  
 
-st.sidebar.title("Summarization Parameters")
-min_length = st.sidebar.slider("Minimum Length", 10, 100, 30)
-max_length = st.sidebar.slider("Maximum Length", 50, 300, 100)
+
 
 #Summarization
 elif selection == 'Summarization':
     st.title("Summarization")
-    st.write("""
-    
-    """)
+    st.write(""" Summarization """)
     uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
 
     if uploaded_file is not None:
