@@ -18,12 +18,12 @@ from io import BytesIO
 
 
 # Initialize summarization models
-bart_summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+#bart_summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 t5_summarizer = pipeline("summarization", model="t5-base")
 
-def summarize_with_bart(text, min_length, max_length):
-    summary = bart_summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
-    return summary
+#def summarize_with_bart(text, min_length, max_length):
+    #summary = bart_summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
+   # return summary
 
 def summarize_with_t5(text, min_length, max_length):
     summary = t5_summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
@@ -35,10 +35,10 @@ def summarize_text(text_list, min_length, max_length):
 
     # Summarize each text in the list
     for text in text_list:
-        bart_summaries.append(summarize_with_bart(text, min_length, max_length))
+      #  bart_summaries.append(summarize_with_bart(text, min_length, max_length))
         t5_summaries.append(summarize_with_t5(text, min_length, max_length))
 
-    return bart_summaries, t5_summaries
+    return t5_summaries
 
 # Initialize Zero-Shot Classification pipeline
 classifier = pipeline('zero-shot-classification', model='typeform/distilbert-base-uncased-mnli')
@@ -377,8 +377,8 @@ elif selection == 'Summarization':
             bart_summaries, t5_summaries = summarize_text(text_list, min_length, max_length)
     
             result_df = pd.DataFrame({
-                "Original Text": text_list,
-                "BART Summary": bart_summaries,
+               # "Original Text": text_list,
+               # "BART Summary": bart_summaries,
                 "T5 Summary": t5_summaries
             })
     
