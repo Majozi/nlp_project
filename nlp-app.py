@@ -78,8 +78,6 @@ elif selection == 'Sentiment':
     # Text Classification pipeline
     classifier = pipeline('sentiment-analysis')
     
-    # Streamlit App
-    st.title('Text Classification App')
     st.write("""
              **TIPS FOR USE:** \n After the analysis has been completed, download the table below and read through a sample of responses to get a feel of
              how accurate the classification was. A rule of thumb is to always pay attention to rows where the 
