@@ -75,7 +75,7 @@ Natural Language Processing (NLP) is a multifaceted field that integrates comput
 elif selection == 'Sentiment':
     st.title("Sentiment Analysis")
 
-        # Text Classification pipeline
+    # Text Classification pipeline
     classifier = pipeline('sentiment-analysis')
     
     # Streamlit App
