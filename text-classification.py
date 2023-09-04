@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 from transformers import pipeline
+import matplotlib.pyplot as plt
 
 # Initialize Zero-Shot Classification pipeline
 classifier = pipeline('zero-shot-classification', model='typeform/distilbert-base-uncased-mnli')
@@ -46,4 +47,22 @@ if uploaded_file is not None:
             return pd.Series([result['labels'][0], result['scores'][0]], index=['label', 'score'])
         
         df[['label', 'score']] = df['text'].apply(lambda x: classify(x, labels))
+        
+        # Normalize the labels and calculate frequency distribution
+        label_counts = df['label'].value_counts(normalize=True)
+        
+        # Sort by frequency
+        label_counts = label_counts.sort_values(ascending=False)
+        
+        # Pie chart
+        fig, ax = plt.subplots()
+        ax.pie(label_counts, labels=label_counts.index, autopct='%1.1f%%', startangle=90, colors=['#005baa', '#c48939', '#d61c33'])
+        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        
+        # Remove background
+        ax.set_facecolor('none')
+        fig.patch.set_visible(False)
+        
+        st.pyplot(fig)
+
         st.write(df)
