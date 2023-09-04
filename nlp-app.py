@@ -68,7 +68,7 @@ st.image(image_url, width=100)
 
 # Top Navigation
 st.sidebar.title('Text Analytics')
-selection = st.sidebar.radio("Go to", ['Getting Started', 'Summarization','Sentiment', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling'])
+selection = st.sidebar.radio("Go to", ['Getting Started', 'Summarization', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling'])
 
 if selection == 'Getting Started':
     st.title("Natural Language Processing")
