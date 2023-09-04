@@ -8,9 +8,15 @@ classifier = pipeline('zero-shot-classification', model='typeform/distilbert-bas
 
 # Streamlit App Title
 st.title('Text Classification App')
-
+st.write("""
+The model used for this classification is **typeform/distilbert-base-uncased-mnli**. Ensure that you have done good groundwork in
+identifying the recurring ideas from the text. This classifier takes either single words or short phases that are separated by a comma. \n \n
+**TIPS FOR USAGE:** \n
+First, run the word cloud and the N-GRAM analysis so you can identify the big ideas. You can modify the words / phrases to get the best results. \n
+When breaking the data into fragments, just be aware that the analysis will be based on the fragment and may not be representative of the whole part.
+""")
 # Define user input for Classification Labels
-labels = st.text_input('Enter your classification labels, separated by comma')
+labels = st.text_input(' **Enter your classification labels, separated by comma** ')
 
 # Split the labels into a list
 labels = [label.strip() for label in labels.split(',')]
