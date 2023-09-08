@@ -15,6 +15,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
+from transformers import DistilBertForSequenceClassification
 
 #cache the text classification model
 def tex_classification_model():
