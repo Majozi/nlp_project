@@ -17,13 +17,8 @@ import base64
 from io import BytesIO
 from transformers import DistilBertForSequenceClassification
 
-#cache the text classification model
-def tex_classification_model():
-    model = DistilBertForSequenceClassification.from_pretrained('typeform/distilbert-base-uncased-mnli')
-    return model
-
 # Initialize Zero-Shot Classification pipeline
-classifier = pipeline('zero-shot-classification', model= tex_classification_model())
+classifier = pipeline('zero-shot-classification', model= model='typeform/distilbert-base-uncased-mnli')
 
 # Downloading the NLTK resources if not downloaded
 nltk.download('stopwords')
