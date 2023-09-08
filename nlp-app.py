@@ -16,9 +16,13 @@ import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 
+#cache the text classification model
+def tex_classification_model():
+    model = DistilBertForSequenceClassification.from_pretrained('typeform/distilbert-base-uncased-mnli')
+    return model
 
 # Initialize Zero-Shot Classification pipeline
-classifier = pipeline('zero-shot-classification', model='typeform/distilbert-base-uncased-mnli')
+classifier = pipeline('zero-shot-classification', model= tex_classification_model())
 
 # Downloading the NLTK resources if not downloaded
 nltk.download('stopwords')
