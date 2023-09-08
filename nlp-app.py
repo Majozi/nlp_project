@@ -18,7 +18,7 @@ from io import BytesIO
 from transformers import DistilBertForSequenceClassification
 
 # Initialize Zero-Shot Classification pipeline
-classifier = pipeline('zero-shot-classification', model= model='typeform/distilbert-base-uncased-mnli')
+classifier = pipeline('zero-shot-classification', model='typeform/distilbert-base-uncased-mnli')
 
 # Downloading the NLTK resources if not downloaded
 nltk.download('stopwords')
