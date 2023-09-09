@@ -506,8 +506,7 @@ elif selection == 'Combined Analysis':
     
 
     st.subheader("4. Topic Modelling")
-    st.title('Topic Modelling')
-
+   
     # Input for min and max value of topics
     min_topics = st.slider("Select the Minimum Number of Topics", min_value=1, max_value=10, value=1)
     max_topics = st.slider("Select the Maximum Number of Topics", min_value=min_topics, max_value=20, value=5)
