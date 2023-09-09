@@ -438,9 +438,6 @@ elif selection == 'Combined Analysis':
     st.subheader("Sentiment")
     classifier = pipeline('sentiment-analysis')
     
-       # File Upload
-    uploaded_file = st.file_uploader("Upload CSV or Excel with a column name 'text'.", type=['csv', 'xlsx'])
-    
     if uploaded_file is not None:
         try:
             df = pd.read_csv(uploaded_file)
@@ -510,8 +507,7 @@ elif selection == 'Combined Analysis':
 
     st.subheader("4. Topic Modelling")
     st.title('Topic Modelling')
-    # Upload file
-    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
+
     # Input for min and max value of topics
     min_topics = st.slider("Select the Minimum Number of Topics", min_value=1, max_value=10, value=1)
     max_topics = st.slider("Select the Maximum Number of Topics", min_value=min_topics, max_value=20, value=5)
