@@ -340,103 +340,8 @@ elif selection == 'N-Grams (Thematic)':
 elif selection == 'Combined Analysis':
     st.title("Combined Analysis")
 
-    st.subheader("Sentiment")
-    classifier = pipeline('sentiment-analysis')
+    st.subheader("Text Classification")
     
-    st.write("""
-         **TIPS FOR USE:** \n After the analysis has been completed, download the table below and read through a sample of responses to get a feel of
-         how accurate the classification was. A rule of thumb is to always pay attention to rows where the 
-         score is below 50 and the sentiment is negative and the score is close to 100%. \n 
-         An overall positive sentiment that is below 50% (depending on the question asked), may be
-         an immediate indicator of issues to be addressed. To find these, filter for a score above 75%
-         and a negative label. \n
-         Be mindful that you may have to reclassify and then recalculate the overall sentiment.
-         """)
-
-    # File Upload
-    uploaded_file = st.file_uploader("Upload CSV or Excel with a column name 'text'.", type=['csv', 'xlsx'])
-    
-    if uploaded_file is not None:
-        try:
-            df = pd.read_csv(uploaded_file)
-        except Exception as e:
-            df = pd.read_excel(uploaded_file)
-    
-        if 'text' not in df.columns:
-            st.markdown('File does not have a `text` column. Please upload another.')
-        else:
-            # Drop NaN or empty values and ensure the 'text' column contains strings
-            df.dropna(subset=['text'], inplace=True)
-            df['text'] = df['text'].astype(str)
-    
-            # Perform Text Classification in a batch
-            classified_text = classifier(df['text'].tolist())
-            
-            df['label'] = [item['label'] for item in classified_text]
-            df['score'] = [item['score'] * 100 for item in classified_text]
-    
-            st.write(df)
-    
-            # Download DataFrame
-            st.markdown(get_table_download_link(df), unsafe_allow_html=True)
-    
-            # Sentiment Percentage
-            sentiment_counts = df['label'].value_counts(normalize=True)
-    
-            # Define colors
-            colors = ['#005baa' if label == 'POSITIVE' else '#c48939' for label in sentiment_counts.index]
-    
-            # Pie Chart
-            fig, ax = plt.subplots()
-            ax.pie(sentiment_counts, labels=sentiment_counts.index, colors=colors, autopct='%1.1f%%', startangle=90)
-            ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    
-            st.pyplot(fig)
-    
-            # Download Pie Chart
-            st.markdown(get_pie_chart_download_link(fig), unsafe_allow_html=True)
-
-    st.subheader("N-GRAMS - Thematic")
-    st.title("Thematic Analysis Using N-Grams")
-    st.write("""
-    **How to use this analysis:** \n Once the analysis is done, group similar ideas in the table below to get the themes. You can also copy the table and paste it to ChatGPT and use a prompt to get the themes. To flesh them out in your discussion, go back to your original data and search these words to get more insight. When creating a theme, 
-    remember to get a sum of all the bigrams/trigrams that you combined so that you may Quantify your argument. \n \n **PLEASE NOTE THIS**: The table below doesn't represent the number of responses, but the number of times the
-    bigrams/trigrams occur on your data.
-    """)
-    uploaded_file = st.file_uploader("Choose an Excel file containing 'text' column", type="xlsx")
-    
-    ngram_min = st.slider("Minimum N-gram Range", 1, 5, 2)
-    ngram_max = st.slider("Maximum N-gram Range", ngram_min, 5, 4)
-    
-    if uploaded_file is not None:
-        df_ngram = thematic_analysis(uploaded_file, ngram_min, ngram_max)
-        st.write(df_ngram)
-    
-        if df_ngram is not None and not df_ngram.empty:
-            top_ngrams = df_ngram.head(25)
-    
-            chart = alt.Chart(top_ngrams).mark_bar().encode(
-                y=alt.Y('ngram:O', sort='-x'),
-                x='frequency:Q',
-                tooltip=['ngram', 'frequency']
-            ).properties(
-                title='Top 25 N-grams',
-                width=600
-            )
-    
-            st.altair_chart(chart)  
-    
-            st.write(result_df)
-
-    st.subheader("3. Text Classification")
-    st.title('Text Classification App')
-    st.write("""
-    The model used for this classification is **typeform/distilbert-base-uncased-mnli**. Ensure that you have done good groundwork in
-    identifying the recurring ideas from the text. This classifier takes either single words or short phases that are separated by a comma. \n \n
-    **TIPS FOR USAGE:** \n
-    First, run the word cloud and the N-GRAM analysis so you can identify the big ideas. You can modify the words / phrases to get the best results. \n
-    When breaking the data into fragments, just be aware that the analysis will be based on the fragment and may not be representative of the whole part.
-    """)
    # Custom CSS for download buttons
     st.markdown("""
     <style>
@@ -529,6 +434,79 @@ elif selection == 'Combined Analysis':
             st.markdown(f'<a href="data:text/csv;base64,{csv_base64}" download="classified_data.csv" class="download-btn"><i class="fas fa-download"></i> Download Data as CSV</a>', unsafe_allow_html=True)
             # Display DataFrame
             st.write(df)
+
+    st.subheader("Sentiment")
+    classifier = pipeline('sentiment-analysis')
+    
+       # File Upload
+    uploaded_file = st.file_uploader("Upload CSV or Excel with a column name 'text'.", type=['csv', 'xlsx'])
+    
+    if uploaded_file is not None:
+        try:
+            df = pd.read_csv(uploaded_file)
+        except Exception as e:
+            df = pd.read_excel(uploaded_file)
+    
+        if 'text' not in df.columns:
+            st.markdown('File does not have a `text` column. Please upload another.')
+        else:
+            # Drop NaN or empty values and ensure the 'text' column contains strings
+            df.dropna(subset=['text'], inplace=True)
+            df['text'] = df['text'].astype(str)
+    
+            # Perform Text Classification in a batch
+            classified_text = classifier(df['text'].tolist())
+            
+            df['label'] = [item['label'] for item in classified_text]
+            df['score'] = [item['score'] * 100 for item in classified_text]
+    
+            st.write(df)
+    
+            # Download DataFrame
+            st.markdown(get_table_download_link(df), unsafe_allow_html=True)
+    
+            # Sentiment Percentage
+            sentiment_counts = df['label'].value_counts(normalize=True)
+    
+            # Define colors
+            colors = ['#005baa' if label == 'POSITIVE' else '#c48939' for label in sentiment_counts.index]
+    
+            # Pie Chart
+            fig, ax = plt.subplots()
+            ax.pie(sentiment_counts, labels=sentiment_counts.index, colors=colors, autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    
+            st.pyplot(fig)
+    
+            # Download Pie Chart
+            st.markdown(get_pie_chart_download_link(fig), unsafe_allow_html=True)
+
+    st.subheader("N-GRAMS - Thematic")
+       
+    ngram_min = st.slider("Minimum N-gram Range", 1, 5, 2)
+    ngram_max = st.slider("Maximum N-gram Range", ngram_min, 5, 4)
+    
+    if uploaded_file is not None:
+        df_ngram = thematic_analysis(uploaded_file, ngram_min, ngram_max)
+        st.write(df_ngram)
+    
+        if df_ngram is not None and not df_ngram.empty:
+            top_ngrams = df_ngram.head(25)
+    
+            chart = alt.Chart(top_ngrams).mark_bar().encode(
+                y=alt.Y('ngram:O', sort='-x'),
+                x='frequency:Q',
+                tooltip=['ngram', 'frequency']
+            ).properties(
+                title='Top 25 N-grams',
+                width=600
+            )
+    
+            st.altair_chart(chart)  
+    
+            st.write(result_df)
+
+    
 
     st.subheader("4. Topic Modelling")
     st.title('Topic Modelling')
