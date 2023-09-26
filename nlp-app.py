@@ -23,7 +23,6 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.metrics.pairwise import cosine_similarity
 
-
 @st.cache(allow_output_mutation=True)
 def load_model():
     return pipeline('zero-shot-classification', model='typeform/distilbert-base-uncased-mnli')
@@ -79,7 +78,7 @@ st.image(image_url, width=100)
 
 # Top Navigation
 st.sidebar.title('Text Analytics')
-selection = st.sidebar.radio("Go to", ['Getting Started', 'Explore Text', 'Sentiment', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling', 'Combined Analysis'])
+selection = st.sidebar.radio("Go to", ['Getting Started', 'Sentiment', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling', 'Combined Analysis'])
 
 if selection == 'Getting Started':
     st.title("Natural Language Processing")
@@ -87,36 +86,6 @@ if selection == 'Getting Started':
 
 Natural Language Processing (NLP) is a multifaceted field that integrates computer science, artificial intelligence, and linguistics to facilitate the interaction between computers and human language. In the context of higher education research, NLP plays a vital role in analyzing and synthesizing vast amounts of textual data. Researchers leverage NLP techniques to automatically grade assignments, detect plagiarism, and extract meaningful insights from academic texts. Moreover, NLP supports the summarization of extensive literature, the assessment of language proficiency, and the personalization of learning experiences. These applications not only enhance the efficiency and effectiveness of educational practices but also open new avenues for exploration and innovation in higher education. Through its ability to understand and process natural language, NLP is revolutionizing the way higher education institutions conduct research, teach, and engage with students.
     """)
-
-elif selection == 'Explore Text':
-    st.title("Explore Text")
-
-    # File Upload
-    uploaded_file = st.file_uploader("Upload your file (CSV or Excel)", type=["csv", "xlsx"])
-    
-    if uploaded_file:
-        if uploaded_file.name.endswith('.csv'):
-            df = pd.read_csv(uploaded_file)
-        else:
-            df = pd.read_excel(uploaded_file)
-    
-        if 'text' not in df.columns:
-            st.error("The uploaded file does not contain a column named 'text'. Please upload a valid file.")
-        else:
-            # Data Preprocessing
-            feedback_text = df['text'].dropna().astype(str).tolist()
-            
-            # 1. Word Cloud Analysis
-            st.subheader('1. Word Cloud Analysis')
-            wc_width = st.slider("Word Cloud Width", 400, 1200, 800)
-            wc_height = st.slider("Word Cloud Height", 200, 800, 400)
-            
-            filtered_words = ' '.join(feedback_text).split()
-            filtered_words = [word for word in filtered_words if word.lower() not in set(CountVectorizer(stop_words='english').get_stop_words())]
-            word_freq = Counter(filtered_words)
-            wordcloud = WordCloud(width=wc_width, height=wc_height, background_color='white').generate_from_frequencies(word_freq)
-            
-            st.image(wordcloud.to_array(), caption='Word Cloud of Feedback', use_column_width=True)
 
 elif selection == 'Sentiment':
     st.title("Sentiment Analysis")
