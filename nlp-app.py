@@ -43,6 +43,8 @@ def extractive_summarize(text):
 
 count_vectorizer = CountVectorizer(stop_words='english')
 tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_vectorizer = TfidfVectorizer()
+#tfidf_matrix = tfidf_vectorizer.fit_transform(df['text_column'])
 
 # Function to check if a response is meaningless
 def is_meaningless(text):
