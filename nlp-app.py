@@ -33,14 +33,6 @@ def load_model():
 # Initialize Zero-Shot Classification pipeline
 classifier = load_model()
 
-# Functions
-def is_meaningless(text):
-    return bool(re.fullmatch(r'[0-9\s\W]*', text))
-
-def extractive_summarize(text):
-    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
-    return sentences[0] if sentences else "No text to summarize"
-
 count_vectorizer = CountVectorizer(stop_words='english')
 tfidf_vectorizer = TfidfVectorizer(stop_words='english')
 tfidf_vectorizer = TfidfVectorizer()
