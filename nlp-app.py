@@ -33,20 +33,6 @@ def load_model():
 # Initialize Zero-Shot Classification pipeline
 classifier = load_model()
 
-count_vectorizer = CountVectorizer(stop_words='english')
-tfidf_vectorizer = TfidfVectorizer(stop_words='english')
-tfidf_vectorizer = TfidfVectorizer()
-#tfidf_matrix = tfidf_vectorizer.fit_transform(df['text_column'])
-
-# Function to check if a response is meaningless
-def is_meaningless(text):
-    return bool(re.fullmatch(r'[0-9\s\W]*', text))
-
-# Function for extractive summarization (Replace this function with your actual code)
-def extractive_summarize(texts):
-    # Replace this comment with your actual code for extractive summarization
-    return "Extracted summary here"
-
 # Downloading the NLTK resources if not downloaded
 nltk.download('stopwords')
 nltk.download('wordnet')
