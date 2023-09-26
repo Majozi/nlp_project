@@ -24,6 +24,19 @@ def load_model():
 # Initialize Zero-Shot Classification pipeline
 classifier = load_model()
 
+# Function to check if a response is meaningless
+def is_meaningless(text):
+    return bool(re.fullmatch(r'[0-9\s\W]*', text))
+
+# Function for extractive summarization (Replace this function with your actual code)
+def extractive_summarize(texts):
+    # Replace this comment with your actual code for extractive summarization
+    return "Extracted summary here"
+
+feedback_text = df['text'].dropna().values
+# Assuming df is your original DataFrame and 'feedback_column' contains the feedback text
+feedback_text = feedback_text.tolist()
+
 # Downloading the NLTK resources if not downloaded
 nltk.download('stopwords')
 nltk.download('wordnet')
@@ -52,6 +65,10 @@ def download_csv(df):
 def thematic_analysis(file, ngram_min, ngram_max):
     df = pd.read_excel(file)
     df = df[['text']].dropna()
+    feedback_text = df['text'].dropna().values
+    # Assuming df is your original DataFrame and 'feedback_column' contains the feedback text
+    feedback_text = feedback_text.tolist()
+    
     
     stoplist = stopwords.words('english')
     c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(ngram_min, ngram_max))
@@ -72,7 +89,7 @@ st.image(image_url, width=100)
 
 # Top Navigation
 st.sidebar.title('Text Analytics')
-selection = st.sidebar.radio("Go to", ['Getting Started', 'Sentiment', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling', 'Combined Analysis'])
+selection = st.sidebar.radio("Go to", ['Getting Started', 'Explore Text', 'Sentiment', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling', 'Combined Analysis'])
 
 if selection == 'Getting Started':
     st.title("Natural Language Processing")
@@ -80,6 +97,20 @@ if selection == 'Getting Started':
 
 Natural Language Processing (NLP) is a multifaceted field that integrates computer science, artificial intelligence, and linguistics to facilitate the interaction between computers and human language. In the context of higher education research, NLP plays a vital role in analyzing and synthesizing vast amounts of textual data. Researchers leverage NLP techniques to automatically grade assignments, detect plagiarism, and extract meaningful insights from academic texts. Moreover, NLP supports the summarization of extensive literature, the assessment of language proficiency, and the personalization of learning experiences. These applications not only enhance the efficiency and effectiveness of educational practices but also open new avenues for exploration and innovation in higher education. Through its ability to understand and process natural language, NLP is revolutionizing the way higher education institutions conduct research, teach, and engage with students.
     """)
+
+elif selection == 'Explore Text':
+    st.title("Explore Text")
+
+    # 1. Word Cloud Analysis
+    all_words = ' '.join(feedback_text).split()
+    filtered_words = [word for word in all_words if word.lower() not in set(CountVectorizer(stop_words='english').get_stop_words())]
+    word_freq = Counter(filtered_words)
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(word_freq)
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.title("Word Cloud of Student Feedback")
+    plt.show()
 
 elif selection == 'Sentiment':
     st.title("Sentiment Analysis")
