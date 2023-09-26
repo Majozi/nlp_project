@@ -16,6 +16,15 @@ import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 from transformers import DistilBertForSequenceClassification
+import networkx as nx
+from collections import Counter
+from wordcloud import WordCloud
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.metrics.pairwise import cosine_similarity
+from mlxtend.preprocessing import TransactionEncoder
+from mlxtend.frequent_patterns import apriori, association_rules
+
 
 @st.cache(allow_output_mutation=True)
 def load_model():
