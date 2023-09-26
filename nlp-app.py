@@ -24,6 +24,17 @@ def load_model():
 # Initialize Zero-Shot Classification pipeline
 classifier = load_model()
 
+# Functions
+def is_meaningless(text):
+    return bool(re.fullmatch(r'[0-9\s\W]*', text))
+
+def extractive_summarize(text):
+    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
+    return sentences[0] if sentences else "No text to summarize"
+
+count_vectorizer = CountVectorizer(stop_words='english')
+tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+
 # Function to check if a response is meaningless
 def is_meaningless(text):
     return bool(re.fullmatch(r'[0-9\s\W]*', text))
@@ -60,11 +71,7 @@ def download_csv(df):
 
 def thematic_analysis(file, ngram_min, ngram_max):
     df = pd.read_excel(file)
-    df = df[['text']].dropna()
-    feedback_text = df['text'].dropna().values
-    # Assuming df is your original DataFrame and 'feedback_column' contains the feedback text
-    feedback_text = feedback_text.tolist()
-    
+    df = df[['text']].dropna()    
     
     stoplist = stopwords.words('english')
     c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(ngram_min, ngram_max))
@@ -97,16 +104,32 @@ Natural Language Processing (NLP) is a multifaceted field that integrates comput
 elif selection == 'Explore Text':
     st.title("Explore Text")
 
-    # 1. Word Cloud Analysis
-    all_words = ' '.join(feedback_text).split()
-    filtered_words = [word for word in all_words if word.lower() not in set(CountVectorizer(stop_words='english').get_stop_words())]
-    word_freq = Counter(filtered_words)
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(word_freq)
-    plt.figure(figsize=(10, 5))
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis("off")
-    plt.title("Word Cloud of Student Feedback")
-    plt.show()
+    # File Upload
+    uploaded_file = st.file_uploader("Upload your file (CSV or Excel)", type=["csv", "xlsx"])
+    
+    if uploaded_file:
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+    
+        if 'text' not in df.columns:
+            st.error("The uploaded file does not contain a column named 'text'. Please upload a valid file.")
+        else:
+            # Data Preprocessing
+            feedback_text = df['text'].dropna().astype(str).tolist()
+            
+            # 1. Word Cloud Analysis
+            st.subheader('1. Word Cloud Analysis')
+            wc_width = st.slider("Word Cloud Width", 400, 1200, 800)
+            wc_height = st.slider("Word Cloud Height", 200, 800, 400)
+            
+            filtered_words = ' '.join(feedback_text).split()
+            filtered_words = [word for word in filtered_words if word.lower() not in set(CountVectorizer(stop_words='english').get_stop_words())]
+            word_freq = Counter(filtered_words)
+            wordcloud = WordCloud(width=wc_width, height=wc_height, background_color='white').generate_from_frequencies(word_freq)
+            
+            st.image(wordcloud.to_array(), caption='Word Cloud of Feedback', use_column_width=True)
 
 elif selection == 'Sentiment':
     st.title("Sentiment Analysis")
