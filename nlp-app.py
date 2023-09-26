@@ -33,10 +33,6 @@ def extractive_summarize(texts):
     # Replace this comment with your actual code for extractive summarization
     return "Extracted summary here"
 
-feedback_text = df['text'].dropna().values
-# Assuming df is your original DataFrame and 'feedback_column' contains the feedback text
-feedback_text = feedback_text.tolist()
-
 # Downloading the NLTK resources if not downloaded
 nltk.download('stopwords')
 nltk.download('wordnet')
