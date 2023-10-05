@@ -21,6 +21,23 @@ def extractive_summarize(text):
     sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
     return sentences[0] if sentences else "No text to summarize"
 
+# Function to plot the graph
+def plot_graph(filtered_feedback, cosine_sim, threshold):
+    G = nx.Graph()
+    for i in range(len(filtered_feedback)):
+        G.add_node(i, text=filtered_feedback[i])
+
+    for i in range(len(filtered_feedback)):
+        for j in range(i+1, len(filtered_feedback)):
+            if cosine_sim[i, j] > threshold:
+                G.add_edge(i, j, weight=cosine_sim[i, j])
+
+    plt.figure(figsize=(12, 12))
+    pos = nx.spring_layout(G, seed=42)
+    nx.draw(G, pos, with_labels=True, labels=nx.get_node_attributes(G, 'text'), node_color='skyblue', node_size=500, font_size=8, font_color='black', edge_color='gray')
+    plt.title('Network Graph of Student Feedback About Tutor Based on Cosine Similarity')
+    st.pyplot()
+
 count_vectorizer = CountVectorizer(stop_words='english')
 tfidf_vectorizer = TfidfVectorizer(stop_words='english')
 
@@ -114,18 +131,22 @@ if uploaded_file:
 
     # 6. Network Graph Analysis
     st.subheader('6. Network Graph Analysis')
-    sim_threshold = st.slider('Similarity Threshold', 0.0, 1.0, 0.2, 0.01)
     
+    # User Input for similarity threshold
+    threshold = st.slider('Set Similarity Threshold', min_value=0.0, max_value=1.0, value=0.2, step=0.01)
+    
+    # Filter feedback to only include those that mention "tutor"
+    filtered_feedback = [text for text in df['feedback_text'] if isinstance(text, str) and 'tutor' in text.lower()]
+    
+    # Create TF-IDF matrix
+    tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+    tfidf_matrix = tfidf_vectorizer.fit_transform(filtered_feedback)
+    
+    # Calculate Cosine Similarity
     cosine_sim = cosine_similarity(tfidf_matrix)
-    G = nx.Graph()
-    for i in range(len(feedback_text)):
-        G.add_node(i, text=feedback_text[i])
-    for i in range(len(feedback_text)):
-        for j in range(i+1, len(feedback_text)):
-            if cosine_sim[i, j] > sim_threshold:
-                G.add_edge(i, j, weight=cosine_sim[i, j])
-    # Note: Network graphs can be complex to visualize in Streamlit directly, consider saving as an image or separate view.
-    st.write('Network Graph could be complex to visualize inline. Consider using other tools for large graphs.')
+    
+    # Call function to plot the graph
+    plot_graph(filtered_feedback, cosine_sim, threshold)
 
 
     # 7. Co-occurrence Association Rule Mining
