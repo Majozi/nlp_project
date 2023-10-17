@@ -11,6 +11,8 @@ import pandas as pd
 
 # Functions
 def is_meaningless(text):
+    if pd.isna(text) or not isinstance(text, str):
+        return False
     return bool(re.fullmatch(r'[0-9\s\W]*', text))
 
 # Additional Functions
