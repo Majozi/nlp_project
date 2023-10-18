@@ -26,12 +26,10 @@ def plot_graph(filtered_feedback, cosine_sim, threshold):
     G = nx.Graph()
     for i in range(len(filtered_feedback)):
         G.add_node(i, text=filtered_feedback[i])
-
     for i in range(len(filtered_feedback)):
         for j in range(i+1, len(filtered_feedback)):
             if cosine_sim[i, j] > threshold:
                 G.add_edge(i, j, weight=cosine_sim[i, j])
-
     plt.figure(figsize=(12, 12))
     pos = nx.spring_layout(G, seed=42)
     nx.draw(G, pos, with_labels=True, labels=nx.get_node_attributes(G, 'text'), node_color='skyblue', node_size=500, font_size=8, font_color='black', edge_color='gray')
@@ -63,23 +61,16 @@ if uploaded_file:
         df = pd.read_csv(uploaded_file)
     else:
         df = pd.read_excel(uploaded_file)
-
     if 'text' not in df.columns:
         st.error("The uploaded file does not contain a column named 'text'. Please upload a valid file.")
     else:
-        # Data Preprocessing
         feedback_text = df['text'].dropna().astype(str).tolist()
-
-        # 1. Word Cloud Analysis
         st.subheader('1. Word Cloud Analysis')
         wc_width = st.slider("Word Cloud Width", 400, 1200, 800)
         wc_height = st.slider("Word Cloud Height", 200, 800, 400)
-
         filtered_words = ' '.join(feedback_text).split()
         filtered_words = [word for word in filtered_words if word.lower() not in all_stopwords]
         word_freq = Counter(filtered_words)
         wordcloud = WordCloud(width=wc_width, height=wc_height, background_color='white').generate_from_frequencies(word_freq)
-
         st.image(wordcloud.to_array(), caption='Word Cloud of Feedback', use_column_width=True)
-
-        # Continue with the rest of the code...
+        # Additional sections can be added here following the same pattern
