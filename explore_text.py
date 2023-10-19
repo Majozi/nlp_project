@@ -72,9 +72,3 @@ if uploaded_file:
         # Additional sections and analysis can go here
         # ...
 
-# Save the script to a file
-script_filename = '/mnt/data/complete_text_analysis_script_with_all_features.py'
-with open(script_filename, 'w') as f:
-    f.write(script_content)
-
-script_filename
