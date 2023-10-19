@@ -87,3 +87,39 @@ if uploaded_file:
         for p in ax1.patches:
             ax1.annotate(f'{int(p.get_height())}', (p.get_x() + p.get_width() / 2., p.get_height()), ha='center', va='baseline')
         st.pyplot(fig1)
+
+        # 3. Meaningless Responses Check
+        st.subheader('3. Meaningless Responses Check')
+        st.write('This section identifies responses that are meaningless (e.g., consist only of numbers, whitespace, or special characters).')
+        df['is_meaningless'] = df['text'].apply(lambda x: is_meaningless(str(x)) if pd.notna(x) else False)
+        meaningless_count = df['is_meaningless'].sum()
+        st.write(f"Number of meaningless responses: {meaningless_count}")
+
+        # 4. Extractive Summary
+        st.subheader('4. Extractive Summary')
+        st.write('This section provides an extractive summary by selecting the first sentence from the concatenated feedback text.')
+        all_texts = " ".join(df['text'].astype(str))
+        extractive_summary = extractive_summarize(all_texts)
+        st.write("Extractive Summary:")
+        st.write(extractive_summary)
+
+        # 5. Top Most Important Words Using TF-IDF
+        st.subheader('5. Top Most Important Words Using TF-IDF')
+        top_n_words = st.slider('Select Top N Words', 5, 50, 20)
+        tfidf_vectorizer = TfidfVectorizer(stop_words=all_stopwords)
+        tfidf_matrix = tfidf_vectorizer.fit_transform(feedback_text)
+        feature_names = tfidf_vectorizer.get_feature_names_out()
+        tfidf_scores = np.sum(tfidf_matrix.toarray(), axis=0)
+        sorted_tfidf = sorted(zip(feature_names, tfidf_scores), key=lambda x: x[1], reverse=True)[:top_n_words]
+        words = [word[0] for word in sorted_tfidf]
+        tfidf_values = [word[1] for word in sorted_tfidf]
+        fig2, ax2 = plt.subplots()
+        bars = ax2.barh(words, tfidf_values, color='purple')
+        for bar, value in zip(bars, tfidf_values):
+            ax2.text(bar.get_width() - 0.05, bar.get_y() + bar.get_height()/2 - 0.2, f"{value:.2f}", va='center', ha='center', color='white')
+        ax2.set_xlabel('TF-IDF Score')
+        ax2.set_ylabel('Words')
+        ax2.set_title(f'Top {top_n_words} Words by TF-IDF Score')
+        ax2.invert_yaxis()
+        st.pyplot(fig2)
+
