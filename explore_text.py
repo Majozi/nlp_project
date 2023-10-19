@@ -120,6 +120,28 @@ if uploaded_file:
         ax2.set_xlabel('TF-IDF Score')
         ax2.set_ylabel('Words')
         ax2.set_title(f'Top {top_n_words} Words by TF-IDF Score')
+
+                # 6. Network Graph Analysis
+        st.subheader('6. Network Graph Analysis')
+        threshold = st.slider('Set Similarity Threshold', min_value=0.0, max_value=1.0, value=0.2, step=0.01)
+        filtered_feedback = [text for text in feedback_text if 'tutor' in text.lower()]
+        tfidf_vectorizer = TfidfVectorizer(stop_words=all_stopwords)
+        tfidf_matrix = tfidf_vectorizer.fit_transform(filtered_feedback)
+        cosine_sim = cosine_similarity(tfidf_matrix)
+        plot_graph(filtered_feedback, cosine_sim, threshold)
+
+        # 7. Co-occurrence Association Rule Mining
+        st.subheader('7. Co-occurrence Association Rule Mining')
+        min_support = st.slider('Minimum Support', 0.001, 0.1, 0.01, 0.001)
+        tokenized_feedback = [list(set([word.lower() for word in text.split() if word.lower() not in all_stopwords])) for text in feedback_text]
+        te = TransactionEncoder()
+        te_array = te.fit(tokenized_feedback).transform(tokenized_feedback)
+        df_te = pd.DataFrame(te_array, columns=te.columns_)
+        frequent_itemsets = apriori(df_te, min_support=min_support, use_colnames=True)
+        association_rules_df = association_rules(frequent_itemsets, metric='lift', min_threshold=0.1)
+        st.write("Association Rules sorted by lift:")
+        st.write(association_rules_df.sort_values(by='lift', ascending=False).head())
+
         ax2.invert_yaxis()
         st.pyplot(fig2)
 
