@@ -165,7 +165,7 @@ elif selection == 'Topic Modelling':
 
         # cleaning master function
         def clean_text(text, bigrams=False):
-            text = text.lower()  # lower case
+        #    text = text.lower()  # lower case
             text = re.sub('[' + re.escape(my_punctuation) + ']+', ' ', text)  # strip punctuation
             text = re.sub('\s+', ' ', text)  # remove double spacing
             text = re.sub('([0-9]+)', '', text)  # remove numbers
