@@ -268,14 +268,17 @@ elif selection == 'Text Classification':
         else:
             def classify(text, labels):
                 result = classifier(text, labels)
-                return pd.Series([result['labels'][0], result['scores'][0]], index=['label', 'score'])
-            
-            df[['label', 'score']] = df['text'].apply(lambda x: classify(x, labels))
+                if 'labels' in result and 'scores' in result:
+                    return pd.Series([result['labels'][0], result['scores'][0]], index=['label', 'score'])
+                else:
+                    return pd.Series([None, None], index=['label', 'score'])
+
+            if len(df) > 0 and labels is not None and len(labels) > 0:
+                df[['label', 'score']] = df['text'].apply(lambda x: classify(x, labels))
     
             # Normalize the labels and calculate frequency distribution
-            label_counts = df['label'].value_counts(normalize=True)
-            
-            # Sort by frequency
+            if 'label' in df.columns:
+                label_counts = df['label'].value_counts(normalize=True)
             label_counts = label_counts.sort_values(ascending=False)
             
             # Pie chart
