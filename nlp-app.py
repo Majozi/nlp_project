@@ -265,6 +265,14 @@ elif selection == 'Text Classification':
             st.markdown('File does not have a `text` column. Please upload another.')
         elif not labels:
             st.markdown('Please enter some classification labels.')
+            # Add type and value checks for labels and text
+            if not isinstance(labels, list):
+                st.error("Labels should be a list.")
+                return
+
+            if any(not isinstance(text, str) for text in df['text']):
+                st.error("All text data should be of type string.")
+                return
         else:
             def classify(text, labels):
                 result = classifier(text, labels)
