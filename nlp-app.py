@@ -268,11 +268,11 @@ elif selection == 'Text Classification':
             # Add type and value checks for labels and text
             if not isinstance(labels, list):
                 st.error("Labels should be a list.")
-                return
+                st.stop()
 
             if any(not isinstance(text, str) for text in df['text']):
                 st.error("All text data should be of type string.")
-                return
+                st.stop()
         else:
             def classify(text, labels):
                 result = classifier(text, labels)
