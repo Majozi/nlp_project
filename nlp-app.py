@@ -498,31 +498,25 @@ elif selection == 'Combined Analysis':
     st.subheader("N-GRAMS - Thematic")
        
     ngram_min = st.slider("Minimum N-gram Range", 1, 5, 2)
-    ngram_max = st.slider("Maximum N-gram Range", ngram_min, 5, 4)
+    ngram_max = st.slider("Maximum N-gram Range", ngram_min, 10, 3)
     
     if uploaded_file is not None:
         df_ngram = thematic_analysis(uploaded_file, ngram_min, ngram_max)
         st.write(df_ngram)
     
         if df_ngram is not None and not df_ngram.empty:
-            top_ngrams = df_ngram.head(25)
+            top_ngrams = df_ngram.head(50)
     
             chart = alt.Chart(top_ngrams).mark_bar().encode(
                 y=alt.Y('ngram:O', sort='-x'),
                 x='frequency:Q',
                 tooltip=['ngram', 'frequency']
             ).properties(
-                title='Top 25 N-grams',
+                title='Top 50 N-grams',
                 width=600
             )
     
             st.altair_chart(chart)  
     
-            st.write(result_df)
+           
 
-    
-
-    
-
-        topics = display_topics(model, tf_feature_names, no_top_words)
-        st.write(topics)
