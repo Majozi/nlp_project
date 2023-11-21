@@ -13,9 +13,99 @@ from sklearn.metrics.pairwise import cosine_similarity
 from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import apriori, association_rules
 
+import json
+import time
+from openai import OpenAI
+
 # Functions
 def is_meaningless(text):
     return bool(re.fullmatch(r'[0-9\s\W]*', text))
+
+class Streamlist:
+    class Subheader:
+        def __init__(self):
+            # Initialize OpenAI client with API key
+            self.api_key = 'XXX'  # Replace with your API key
+            self.client = OpenAI(api_key=self.api_key)
+
+        def get_user_input(self):
+            # Get multi-line context input from the user
+            self.context = input("Enter the context (multi-line, end with a blank line):\n")
+            
+            # Get single-line question input from the user
+            self.question = input("\nEnter your question (single-line):\n")
+
+        def process_input(self):
+            # Create and display JSON
+            def show_json(obj):
+                display(json.loads(obj.model_dump_json()))
+
+            # Create a thread
+            thread = self.client.beta.threads.create()
+            show_json(thread)
+
+            # Create an assistant
+            assistant = self.client.beta.assistants.create(
+                name="Text analyzer",
+                instructions="You are an AI and machine learning specialist specializing in natural language processing.",
+                model="gpt-4-1106-preview",
+            )
+
+            # Create a message to request a summary of 'feedback_text'
+            message = self.client.beta.threads.messages.create(
+                thread_id=thread.id,
+                role="user",
+                content=f"Given the context '{self.context}', summarize the following text in 300 words: {self.question}",
+            )
+
+            # Create and wait for the run to complete
+            run = self.wait_on_run(thread)
+
+            # Retrieve and process messages
+            self.retrieve_messages(thread, message)
+
+        def wait_on_run(self, thread):
+            run = self.client.beta.threads.runs.create(
+                thread_id=thread.id,
+                assistant_id=assistant.id,
+            )
+            while run.status == "queued" or run.status == "in_progress":
+                run = self.client.beta.threads.runs.retrieve(
+                    thread_id=thread.id,
+                    run_id=run.id,
+                )
+                time.sleep(0.5)
+            return run
+
+        def retrieve_messages(self, thread, message):
+            messages = self.client.beta.threads.messages.list(
+                thread_id=thread.id, 
+                order="asc", 
+                after=message.id
+            )
+
+            if messages.data:
+                for message in messages.data:
+                    content = message.content
+                    if content:
+                        for item in content:
+                            if item.type == 'text':
+                                self.print_in_cardview(item.text.value)
+            else:
+                print("No messages found")
+
+        def print_in_cardview(self, value):
+            top_border = "┌─────────────────────────────┐"
+            bottom_border = "└─────────────────────────────┘"
+            side_border = "│"
+
+            max_width = 27
+            lines = [value[i:i+max_width] for i in range(0, len(value), max_width)]
+
+            print(top_border)
+            for line in lines:
+                print(f"{side_border} {line.ljust(max_width)} {side_border}")
+            print(bottom_border)
 
 # Function to plot the graph
 def plot_graph(filtered_feedback, cosine_sim, threshold):
@@ -109,3 +199,8 @@ if uploaded_file:
         tfidf_matrix = tfidf_vectorizer.fit_transform(filtered_feedback)
         cosine_sim = cosine_similarity(tfidf_matrix)
         plot_graph(filtered_feedback, cosine_sim, threshold)
+
+        # Usage
+        subheader = Streamlist.Subheader()
+        subheader.get_user_input()
+        subheader.process_input()
