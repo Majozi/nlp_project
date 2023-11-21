@@ -25,7 +25,7 @@ class Streamlist:
     class Subheader:
         def __init__(self):
             # Initialize OpenAI client with API key
-            self.api_key = 'XXX'  # Replace with your API key
+            self.api_key = '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'  # Replace with your API key
             self.client = OpenAI(api_key=self.api_key)
 
         def get_user_input(self):
