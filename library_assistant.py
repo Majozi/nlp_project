@@ -1,7 +1,7 @@
-import streamlit as st
+Aimport streamlit as st
 import json
 import time
-import openai
+import OpneAI
 import pandas as pd
 
 # Function to show JSON
