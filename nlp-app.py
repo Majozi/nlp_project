@@ -22,6 +22,16 @@ from wordcloud import WordCloud
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.metrics.pairwise import cosine_similarity
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from wordcloud import WordCloud
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
+import nltk
+import openai
+
 
 @st.cache(allow_output_mutation=True)
 def load_model():
@@ -69,6 +79,57 @@ def thematic_analysis(file, ngram_min, ngram_max):
 
     return df_ngram
 
+# OpenAI API functions
+def analyze_text(api_key, text, prompt):
+    openai.api_key = api_key
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt + text,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
+
+# Function to summarize text using OpenAI
+def summarize_text(api_key, text):
+    openai.api_key = api_key
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt="Summarize the following text in less than 300 words:\n\n" + text,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
+
+# Function to analyze sentiment using OpenAI
+def analyze_sentiment(api_key, text):
+    openai.api_key = api_key
+    response = openai.Completion.create(
+        engine="text-davinci-003",  # Adjusted to a standard text engine
+        prompt="Determine the sentiment of this text (positive, neutral, negative):\n\n" + text,
+        max_tokens=60
+    )
+    sentiment = response.choices[0].text.strip().lower()
+    if "positive" in sentiment:
+        return "Positive"
+    elif "negative" in sentiment:
+        return "Negative"
+    else:
+        return "Neutral"
+
+# Function to detect toxicity using OpenAI
+def detect_toxicity(api_key, text):
+    openai.api_key = api_key
+    response = openai.Completion.create(
+        engine="content-filter-alpha-c4",
+        prompt="" + text,
+        max_tokens=1,
+        temperature=0,
+        top_p=0
+    )
+    return response.choices[0].text
+
+# Initialize nltk
+nltk.download('wordnet')
+nltk.download('stopwords')
 
 # Image URL
 image_url = "https://www.up.ac.za/themes/up2.0/images/vertical-logo-bg.png"
@@ -78,7 +139,7 @@ st.image(image_url, width=100)
 
 # Top Navigation
 st.sidebar.title('Text Analytics')
-selection = st.sidebar.radio("Go to", ['Getting Started', 'Sentiment', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling', 'Combined Analysis'])
+selection = st.sidebar.radio("Go to", ['Getting Started', 'Text Exploration','Sentiment', 'N-Grams (Thematic)', 'Text Classification', 'Topic Modelling', 'Combined Analysis'])
 
 if selection == 'Getting Started':
     st.title("Natural Language Processing")
@@ -518,5 +579,92 @@ elif selection == 'Combined Analysis':
     
             st.altair_chart(chart)  
     
-           
+# Topic Modelling Page
+elif selection == 'Text Exploration':
+    st.title('Text Exploration')          
 
+        # OpenAI API Key input
+    api_key = st.text_input("Enter your OpenAI API Key", type="password")
+
+    # File upload
+    uploaded_file = st.file_uploader("Choose an Excel file", type="xlsx")
+    if uploaded_file and api_key:
+        df = pd.read_excel(uploaded_file)
+
+        # Column selection
+        if not df.empty:
+            column = st.selectbox('Select the column to analyze', df.columns)
+
+            # Total Rows Count
+            st.metric(label="Total Rows", value=df.shape[0])
+
+            # Summary of Responses
+            concatenated_text = ' '.join(df[column].astype(str))
+            summary = summarize_text(api_key, concatenated_text)
+            st.write("Summary of Responses:")
+            st.write(summary)
+
+            # Sentiment Analysis and Pie Chart
+            df['sentiment'] = df[column].apply(lambda x: analyze_sentiment(api_key, x))
+            sentiment_counts = df['sentiment'].value_counts()
+            plt.figure(figsize=(8, 8))
+            plt.pie(sentiment_counts, labels=sentiment_counts.index, autopct='%1.1f%%', startangle=140)
+            plt.title('Sentiment Analysis')
+            st.pyplot(plt)
+
+            # Frequency Count Bar Graph of Word Count
+            word_counts = df[column].str.split().str.len()
+            predefined_bins = [0, 5, 10, 15, 25, 50, 100]
+            max_bin = max(predefined_bins[-1], max(word_counts) + 1)
+            bins = predefined_bins + [max_bin] if max_bin > predefined_bins[-1] else predefined_bins
+
+            binned_data = pd.cut(word_counts, bins=bins, include_lowest=True, right=False)
+            frequency_counts = binned_data.value_counts().sort_index()
+            plt.figure(figsize=(10, 6))
+            ax = sns.barplot(x=frequency_counts.index.categories, y=frequency_counts.values, palette="viridis")
+            ax.set_xlabel('Word Count Ranges')
+            ax.set_ylabel('Frequency')
+            ax.set_title('Frequency Count of Word Ranges')
+            ax.set_xticklabels([f"{int(i.left)}-{int(i.right)-1}" for i in frequency_counts.index.categories])
+            for p in ax.patches:
+                ax.annotate(f'{int(p.get_height())}', (p.get_x() + p.get_width() / 2., p.get_height()), 
+                            ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
+                            textcoords='offset points')
+            st.pyplot(plt)
+
+            # User input for words to exclude from the word cloud
+            words_to_exclude = st.text_input("Enter words to exclude from the word cloud, separated by commas").split(',')
+
+            # Word Cloud
+            lemmatizer = WordNetLemmatizer()
+            words = ' '.join(df[column].fillna('').astype(str)).lower()
+            words = ' '.join([lemmatizer.lemmatize(word) for word in words.split() if word not in stopwords.words('english') and word not in words_to_exclude])
+            wordcloud = WordCloud(width=800, height=400).generate(words)
+            plt.figure(figsize=(10, 5))
+            plt.imshow(wordcloud, interpolation='bilinear')
+            plt.axis('off')
+            st.pyplot(plt)
+
+            # Toxicity Detection
+            df['toxicity'] = df[column].apply(lambda x: detect_toxicity(api_key, x))
+            toxic_responses = df[df['toxicity'] == '2']
+            st.write("Toxic Responses:")
+            st.table(toxic_responses[[column, 'toxicity']])
+
+            # Analyze for positive aspects
+            positive_prompt = "List and discuss all positive aspects mentioned in the text:\n\n"
+            positive_aspects = analyze_text(api_key, concatenated_text, positive_prompt)
+            st.subheader("Observation of posivite aspects")
+            st.write(positive_aspects)
+
+            # Analyze for negative aspects
+            negative_prompt = "List and discuss all negative aspects mentioned in the text:\n\n"
+            negative_aspects = analyze_text(api_key, concatenated_text, negative_prompt)
+            st.subheader("Observation of negative aspects")
+            st.write(negative_aspects)
+
+            # Analyze for recommendations
+            recommendations_prompt = "Provide a list of recommendations based on the text:\n\n"
+            recommendations = analyze_text(api_key, concatenated_text, recommendations_prompt)
+            st.subheader("Recommendations")
+            st.write(recommendations)
