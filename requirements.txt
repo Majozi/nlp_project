@@ -24,3 +24,8 @@ networkx
 wordcloud
 mlxtend
 openai==0.27.8
+seaborn
+sklearn
+transformers
+wordcloud
+
