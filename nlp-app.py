@@ -11,7 +11,6 @@ import altair as alt
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import Trainer
 import numpy as np
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
@@ -22,18 +21,15 @@ from wordcloud import WordCloud
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.metrics.pairwise import cosine_similarity
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
-from wordcloud import WordCloud
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
-import nltk
 import openai
+import types
 
+# Custom hash function
+def ignore_hash(*args, **kwargs):
+    return 0
 
-@st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True, hash_funcs={types.FunctionType: ignore_hash})
 def load_model():
     return pipeline('zero-shot-classification', model='typeform/distilbert-base-uncased-mnli')
 
@@ -44,88 +40,76 @@ classifier = load_model()
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Function to make DataFrame downloadable
-def get_table_download_link(df):
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="classified_text.csv">Download CSV File</a>'
+# Chunking Function
+def chunk_text(text, chunk_size=800):
+    return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
 
-# Function to make Pie Chart downloadable
-def get_pie_chart_download_link(fig):
-    buffer = BytesIO()
-    fig.savefig(buffer, format="png")
-    buffer.seek(0)
-    b64 = base64.b64encode(buffer.read()).decode()
-    return f'<a href="data:image/png;base64,{b64}" download="pie_chart.png">Download Pie Chart</a>'
-
-# Function to download N-GRAMS data as a CSV file
-def download_csv(df):
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="ngrams.csv">Download CSV File</a>'
-    return href
-
-def thematic_analysis(file, ngram_min, ngram_max):
-    df = pd.read_excel(file)
-    df = df[['text']].dropna()    
-    
-    stoplist = stopwords.words('english')
-    c_vec = CountVectorizer(stop_words=stoplist, ngram_range=(ngram_min, ngram_max))
-    ngrams = c_vec.fit_transform(df['text'])
-    count_values = ngrams.toarray().sum(axis=0)
-    vocab = c_vec.vocabulary_
-
-    df_ngram = pd.DataFrame(sorted([(count_values[i], k) for k, i in vocab.items()], reverse=True)).rename(columns={0: 'frequency', 1: 'ngram'})
-
-    return df_ngram
-
-# OpenAI API functions
+# OpenAI API functions with chunking
 def analyze_text(api_key, text, prompt):
     openai.api_key = api_key
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt + text,
-        max_tokens=150
-    )
-    return response.choices[0].text.strip()
+    chunks = chunk_text(text)
+    complete_response = []
+    for chunk in chunks:
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo-instruct",
+            prompt=prompt + chunk,
+            max_tokens=150
+        )
+        complete_response.append(response.choices[0].text.strip())
+    return ' '.join(complete_response)
 
-# Function to summarize text using OpenAI
 def summarize_text(api_key, text):
     openai.api_key = api_key
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt="Summarize the following text in less than 300 words:\n\n" + text,
-        max_tokens=150
-    )
-    return response.choices[0].text.strip()
+    chunks = chunk_text(text)
+    summaries = []
+    for chunk in chunks:
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo-instruct",
+            prompt="Summarize this text with 100.:\n\n" + chunk,
+            max_tokens=150
+        )
+        summaries.append(response.choices[0].text.strip())
+    return ' '.join(summaries)
 
-# Function to analyze sentiment using OpenAI
 def analyze_sentiment(api_key, text):
     openai.api_key = api_key
-    response = openai.Completion.create(
-        engine="text-davinci-003",  # Adjusted to a standard text engine
-        prompt="Determine the sentiment of this text (positive, neutral, negative):\n\n" + text,
-        max_tokens=60
-    )
-    sentiment = response.choices[0].text.strip().lower()
-    if "positive" in sentiment:
-        return "Positive"
-    elif "negative" in sentiment:
+    chunks = chunk_text(text)
+    sentiments = []
+    for chunk in chunks:
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo-instruct",
+            prompt="Determine the sentiment of this text (positive, neutral, negative):\n\n" + chunk,
+            max_tokens=60
+        )
+        sentiments.append(response.choices[0].text.strip().lower())
+    # Aggregate sentiments (can be adjusted based on requirements)
+    if "negative" in sentiments:
         return "Negative"
+    elif "positive" in sentiments:
+        return "Positive"
     else:
         return "Neutral"
 
-# Function to detect toxicity using OpenAI
 def detect_toxicity(api_key, text):
     openai.api_key = api_key
-    response = openai.Completion.create(
-        engine="content-filter-alpha-c4",
-        prompt="" + text,
-        max_tokens=1,
-        temperature=0,
-        top_p=0
-    )
-    return response.choices[0].text
+    chunks = chunk_text(text)
+    toxicities = []
+    for chunk in chunks:
+        response = openai.Completion.create(
+            engine="content-filter-alpha-c4",
+            prompt=chunk,
+            max_tokens=1,
+            temperature=0,
+            top_p=0
+        )
+        toxicities.append(response.choices[0].text)
+    if '2' in toxicities:
+        return '2'
+    else:
+        return '0'
+
+# ... [Rest of your existing code for Streamlit UI and logic]
+
 
 # Initialize nltk
 nltk.download('wordnet')
@@ -652,19 +636,19 @@ elif selection == 'Text Exploration':
             st.table(toxic_responses[[column, 'toxicity']])
 
             # Analyze for positive aspects
-            positive_prompt = "List and discuss all positive aspects mentioned in the text:\n\n"
+            positive_prompt = "List a maximum of up to 10 positive things. Use major group categories. Be strict to 10, not more:\n\n"
             positive_aspects = analyze_text(api_key, concatenated_text, positive_prompt)
             st.subheader("Observation of posivite aspects")
             st.write(positive_aspects)
 
             # Analyze for negative aspects
-            negative_prompt = "List and discuss all negative aspects mentioned in the text:\n\n"
+            negative_prompt = "List a maximum of 10 negative things. Use major group categories. Be strict to 10, not more:\n\n"
             negative_aspects = analyze_text(api_key, concatenated_text, negative_prompt)
             st.subheader("Observation of negative aspects")
             st.write(negative_aspects)
 
             # Analyze for recommendations
-            recommendations_prompt = "Provide a list of recommendations based on the text:\n\n"
+            recommendations_prompt = "Give strictly up to 10 recommendations.:\n\n"
             recommendations = analyze_text(api_key, concatenated_text, recommendations_prompt)
             st.subheader("Recommendations")
             st.write(recommendations)
